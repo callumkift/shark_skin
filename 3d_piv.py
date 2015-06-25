@@ -42,10 +42,10 @@ def get_files(a_dir):
 	else:
 		print "Error: Cannot find TXT files in subdirectories!"
 
-def get_data(file_list):
+def get_data(eh, file_list):
 	"""
 	The input is a list of files. Reads all files from the list, averages the velocities for
-	each position and returns the position with their corresponding averaged 
+	each position and returns the position and height with their corresponding averaged 
 	x-/y-/abs-velocities in an array.
 	"""
 	x_pos = []
@@ -91,6 +91,7 @@ def get_data(file_list):
 					row = []
 					row.append(x_pos[i])
 					row.append(y_pos[i])
+					row.append(eh)
 					row.append(ax_vel[i])
 					row.append(ay_vel[i])
 					row.append(aa_vel[i])
@@ -147,22 +148,33 @@ def avg_data_each_h(nof, lof, x_vel, y_vel, a_vel):
 
 if __name__ == '__main__':
 
-	main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/20150609_x20_bdft_os/" #main dir where all the subdirs with the data are
-	sub_dirs = get_subdirectories(main_dir)
-	
-	# Store files of each subdir in a dictionary
-	height_file_dict = {}
-	for dir in sub_dirs:
-		height_file_dict["height{0}".format(dir)]=get_files(dir)
-	height_file_dict = collections.OrderedDict(sorted(height_file_dict.items())) #sorts dictionary by subdir
+	exp_h_list = []
 
-	# Stores an array filled with position and velocities for each height
-	h_pos_vel_dict = {}
-	hcount = 1
-	for k in height_file_dict:
-		h_pos_vel_dict["height{0}".format(hcount)]=get_data(height_file_dict[k])
-		hcount += 1
-	h_pos_vel_dict = collections.OrderedDict(sorted(h_pos_vel_dict.items())) 
+	if len(exp_h_list) != 0:
 
+		main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/20150609_x20_bdft_os/" #main dir where all the subdirs with the data are
+		sub_dirs = get_subdirectories(main_dir)
+		
+		# Store files of each subdir in a dictionary
+		height_file_dict = {}
+		for dir in sub_dirs:
+			height_file_dict["height{0}".format(dir)]=get_files(dir)
+		height_file_dict = collections.OrderedDict(sorted(height_file_dict.items())) #sorts dictionary by subdir
 
+		if len(height_file_dict) == len(exp_h_list):
+			# Stores an array filled with position and velocities for each height
+			h_pos_vel_dict = {}
+			hcount = 1
+			for k in height_file_dict:
+				h_pos_vel_dict["height{0}".format(hcount)]=get_data(exp_h_list[hcount-1], height_file_dict[k])
+				hcount += 1
+			h_pos_vel_dict = collections.OrderedDict(sorted(h_pos_vel_dict.items())) 
+
+			for k in h_pos_vel_dict:
+				print k, h_pos_vel_dict[k][0]
+		else:
+			print "Error: height list does not match number of subdirectories!"
+
+	else:
+		print "Error: experimental height measurements not given!"
 

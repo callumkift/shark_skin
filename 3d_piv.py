@@ -15,6 +15,9 @@ import math
 import matplotlib.pyplot as plt
 
 def sqr(a):
+	"""
+	Returns the square of the input.
+	"""
 	return a*a
 
 def get_subdirectories(a_dir):
@@ -34,25 +37,22 @@ def get_files(a_dir):
 	for file in os.listdir(dir):
 		if file.endswith(".txt"):
 			gf.append(dir + "/" + str(file))
-	return gf
+	if len(gf) != 0:
+		return gf
+	else:
+		print "Error: Cannot find TXT files in subdirectories!"
 
 def get_data(file_list):
 	"""
-	The input is a list of files. 
+	The input is a list of files. Reads all files from the list, averages the velocities for
+	each position and returns the position with their corresponding averaged 
+	x-/y-/abs-velocities.
 	"""
 	x_pos = []
 	y_pos = []
 	x_vel = []
 	y_vel = []
-	abs_vel = []
-
-	# file_dict = {}
-
-	# for i in range(len(file_list)):
-	# 	file_dict["f{0}".format(i)]=file_list[i]
-
-	# file_dict = collections.OrderedDict(sorted(file_dict.items()))
-	#print file_dict.values()
+	a_vel = []
 
 	for file in file_list:
 		with open (file, 'r') as f:
@@ -66,27 +66,68 @@ def get_data(file_list):
 						y_pos.append(float(column[1]))
 						x_vel.append(float(column[2]))
 						y_vel.append(float(column[3]))
-						a_vel.append(math.sqrt())
+						a_vel.append(math.sqrt(sqr(float(column[2])) + sqr(float(column[3]))))
 					else:
 						x_vel.append(float(column[2]))
 						y_vel.append(float(column[3]))
-						a_vel.append(math.sqrt())
+						a_vel.append(math.sqrt(sqr(float(column[2])) + sqr(float(column[3]))))
 				else:
-					print "TXT file is not correct."
-	# for d in range(len(file_dict))
-	# for file in file_list:
-	# 	with open( file, 'r' ) as f : 
-	# 		# Read and ignore header lines:
-	# 		header1 = f.readline()
-	# 		for line in f:
-	# 			line = line.strip() #splits the file into columns
-	# 			columns = line.split() #splits the line into columns at every space in the line
-	# 			if (len(columns) == 4) : 
-	# 				x_vel.append(float(columns[2]))
-	# 				y_vel.append(float(columns[3])) 
-	# 				abs_vel.append(sqrt(sqr(float(columns[2]))+sqr(float(columns[3]))))
-	# 			else:
-	# 				print "txt file is not correct."
+					print "Error: TXT file is not correct!"
+
+	if len(x_pos) == len(y_pos):
+		pos_count = len(x_pos)
+		if len(x_vel) == len(y_vel) and len(x_vel) == len(a_vel):
+			vel_count = len(x_vel)
+			nof = vel_count/pos_count
+			ax_vel, ay_vel, aa_vel = avg_data_each_h(nof, pos_count, x_vel, y_vel, a_vel)
+
+			if len(ax_vel) == len(x_pos):
+				print "success"
+			else:
+				print "Error: averaged velocities do not match with position data!"
+
+		else:
+			print "Error: different number of velocities!"
+	else:
+		print "Error: not all x-positions have a corresponding y-position!"
+
+	
+
+
+
+def avg_data_each_h(nof, lof, x_vel, y_vel, a_vel):
+	"""
+	Averages the x-/y-/abs-velocities for each position at a certain height.
+	"""
+	sx_vel = []
+	sy_vel = []
+	sa_vel = []
+
+	for i in range(lof):
+		sx = 0
+		sy = 0
+		sa = 0
+		for j in range (nof):
+			sx += x_vel[i + (j*nof)]
+			sy += y_vel[i + (j*nof)]
+			sa += a_vel[i + (j*nof)]
+
+		sx_vel.append(sx)
+		sy_vel.append(sy)
+		sa_vel.append(sa)
+
+	if len(sx_vel) == len(sy_vel) and len(sx_vel) == len(sa_vel):
+		ax_vel = np.array(sx_vel)/nof
+		ay_vel = np.array(sy_vel)/nof
+		aa_vel = np.array(sa_vel)/nof
+
+		if len(ax_vel) == len(ay_vel) and len(ax_vel) == len(aa_vel):
+			return ax_vel, ay_vel, aa_vel
+		else:
+			print "Error: averaged velocity data not matching!"
+	else:
+		print "Error: summed velocity data not matching!"
+
 
 if __name__ == '__main__':
 

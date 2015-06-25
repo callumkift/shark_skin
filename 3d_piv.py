@@ -14,6 +14,8 @@ import collections
 import math
 import matplotlib.pyplot as plt
 
+def sqr(a):
+	return a*a
 
 def get_subdirectories(a_dir):
 	"""
@@ -44,15 +46,34 @@ def get_data(file_list):
 	y_vel = []
 	abs_vel = []
 
-	file_dict = {}
+	# file_dict = {}
 
-	for i in range(len(file_list)):
-		file_dict["f{0}".format(i)]=file_list[i]
+	# for i in range(len(file_list)):
+	# 	file_dict["f{0}".format(i)]=file_list[i]
 
-	file_dict = collections.OrderedDict(sorted(file_dict.items()))
-	for k in file_dict:
-		print k, file_dict[k]
+	# file_dict = collections.OrderedDict(sorted(file_dict.items()))
+	#print file_dict.values()
 
+	for file in file_list:
+		with open (file, 'r') as f:
+			header1 = f.readline()
+			for line in f:
+				line = line.strip()
+				column = line.split()
+				if len(column) == 4:
+					if file == file_list[0]:
+						x_pos.append(float(column[0]))
+						y_pos.append(float(column[1]))
+						x_vel.append(float(column[2]))
+						y_vel.append(float(column[3]))
+						a_vel.append(math.sqrt())
+					else:
+						x_vel.append(float(column[2]))
+						y_vel.append(float(column[3]))
+						a_vel.append(math.sqrt())
+				else:
+					print "TXT file is not correct."
+	# for d in range(len(file_dict))
 	# for file in file_list:
 	# 	with open( file, 'r' ) as f : 
 	# 		# Read and ignore header lines:
@@ -79,9 +100,9 @@ if __name__ == '__main__':
 
 	height_file_dict = collections.OrderedDict(sorted(height_file_dict.items())) #sorts dictionary by subdir
 
+	print len(height_file_dict)
+
 	for k in height_file_dict:
-		print k, height_file_dict[k]
-		raw_input("")
 		get_data(height_file_dict[k])
 		raw_input("")
 

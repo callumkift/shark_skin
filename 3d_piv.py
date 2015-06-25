@@ -13,7 +13,7 @@ import os
 import collections
 import math
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import axes3d
+from mpl_toolkits.mplot3d import Axes3D
 
 def sqr(a):
 	"""
@@ -146,7 +146,7 @@ def avg_data_each_h(nof, lof, x_vel, y_vel, a_vel):
 
 def arrays_to_plot(dict_array):
 	"""
-	Puts the dictionary-filled-array into plottable arrays.
+	Puts the dictionary-filled-array into plottable array.
 	"""
 	# p_x = []
 	# p_y = []
@@ -192,7 +192,12 @@ def arrays_to_plot(dict_array):
 
 	return np.array(plottable_array)
 
-
+def plot_vectors(pa):
+	X, Y, Z, U, V, W = zip(*pa)
+	fig = plt.figure()
+	ax = fig.add_subplot(111, projection='3d')
+	ax.quiver(X, Y, Z, U, V, W, length=0.01)
+	plt.show()
 
 if __name__ == '__main__':
 
@@ -223,8 +228,12 @@ if __name__ == '__main__':
 			print "Error: height list does not match number of subdirectories!"
 
 
-		# Turn the dictionary into plottable arrays
+		# Turn the dictionary into plottable arrayslea
 		pa = arrays_to_plot(h_pos_vel_dict)
+
+		plot_vectors(pa)
+
+
 
 
 	else:

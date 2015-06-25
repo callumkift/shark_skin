@@ -46,7 +46,7 @@ def get_data(file_list):
 	"""
 	The input is a list of files. Reads all files from the list, averages the velocities for
 	each position and returns the position with their corresponding averaged 
-	x-/y-/abs-velocities.
+	x-/y-/abs-velocities in an array.
 	"""
 	x_pos = []
 	y_pos = []
@@ -54,6 +54,7 @@ def get_data(file_list):
 	y_vel = []
 	a_vel = []
 
+	# reading data
 	for file in file_list:
 		with open (file, 'r') as f:
 			header1 = f.readline()
@@ -62,6 +63,7 @@ def get_data(file_list):
 				column = line.split()
 				if len(column) == 4:
 					if file == file_list[0]:
+						# Only takes position data from first file as the same in each file
 						x_pos.append(float(column[0]))
 						y_pos.append(float(column[1]))
 						x_vel.append(float(column[2]))
@@ -74,15 +76,28 @@ def get_data(file_list):
 				else:
 					print "Error: TXT file is not correct!"
 
+	# checks list lengths to ensure matching and then averages the velocities for all files
+	# and then returns an array with position and average velocities
 	if len(x_pos) == len(y_pos):
 		pos_count = len(x_pos)
 		if len(x_vel) == len(y_vel) and len(x_vel) == len(a_vel):
 			vel_count = len(x_vel)
-			nof = vel_count/pos_count
+			nof = vel_count/pos_count # equals number of files
 			ax_vel, ay_vel, aa_vel = avg_data_each_h(nof, pos_count, x_vel, y_vel, a_vel)
 
 			if len(ax_vel) == len(x_pos):
-				print "success"
+				height_array = []
+				for i in range(len(x_pos)):
+					row = []
+					row.append(x_pos[i])
+					row.append(y_pos[i])
+					row.append(ax_vel[i])
+					row.append(ay_vel[i])
+					row.append(aa_vel[i])
+					height_array.append(np.array(row))
+
+				height_array = np.array(height_array)
+				return height_array
 			else:
 				print "Error: averaged velocities do not match with position data!"
 
@@ -116,6 +131,7 @@ def avg_data_each_h(nof, lof, x_vel, y_vel, a_vel):
 		sy_vel.append(sy)
 		sa_vel.append(sa)
 
+	# checks lengths match and then averages them and returns the average velocities
 	if len(sx_vel) == len(sy_vel) and len(sx_vel) == len(sa_vel):
 		ax_vel = np.array(sx_vel)/nof
 		ay_vel = np.array(sy_vel)/nof
@@ -138,12 +154,15 @@ if __name__ == '__main__':
 	height_file_dict = {}
 	for dir in sub_dirs:
 		height_file_dict["height{0}".format(dir)]=get_files(dir)
-
 	height_file_dict = collections.OrderedDict(sorted(height_file_dict.items())) #sorts dictionary by subdir
 
-	print len(height_file_dict)
-
+	# Stores an array filled with position and velocities for each height
+	h_pos_vel_dict = {}
+	hcount = 1
 	for k in height_file_dict:
-		get_data(height_file_dict[k])
-		raw_input("")
+		h_pos_vel_dict["height{0}".format(hcount)]=get_data(height_file_dict[k])
+		hcount += 1
+	h_pos_vel_dict = collections.OrderedDict(sorted(h_pos_vel_dict.items())) 
+
+
 

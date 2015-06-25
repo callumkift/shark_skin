@@ -54,6 +54,8 @@ def get_data(eh, file_list):
 	x_vel = []
 	y_vel = []
 	z_vel = []
+	unique_x = []
+	unique_y = []
 
 	# reading data
 	for file in file_list:
@@ -66,7 +68,11 @@ def get_data(eh, file_list):
 					if file == file_list[0]:
 						# Only takes position data from first file as the same in each file
 						x_pos.append(float(column[0]))
+						if float(column[0]) not in unique_x:
+							unique_x.append(float(column[0]))
 						y_pos.append(float(column[1]))
+						if float(column[1]) not in unique_y:
+							unique_y.append(float(column[1]))
 						x_vel.append(float(column[2]))
 						y_vel.append(float(column[3]))
 						# z_vel.append(math.sqrt(sqr(float(column[2])) + sqr(float(column[3]))))
@@ -79,6 +85,9 @@ def get_data(eh, file_list):
 				else:
 					print "Error: TXT file is not correct!"
 
+	ux = len(unique_x)
+	uy = len(unique_y)
+
 	# checks list lengths to ensure matching and then averages the velocities for all files
 	# and then returns an array with position and average velocities
 	if len(x_pos) == len(y_pos):
@@ -89,19 +98,8 @@ def get_data(eh, file_list):
 			ax_vel, ay_vel, az_vel = avg_data_each_h(nof, pos_count, x_vel, y_vel, z_vel)
 
 			if len(ax_vel) == len(x_pos):
-				height_array = []
-				for i in range(len(x_pos)):
-					row = []
-					row.append(x_pos[i])
-					row.append(y_pos[i])
-					row.append(eh)
-					row.append(ax_vel[i])
-					row.append(ay_vel[i])
-					row.append(az_vel[i])
-					height_array.append(np.array(row))
-
-				height_array = np.array(height_array)
-				return height_array
+				subgrid_array = sub_grid(ux, uy, x_pos, y_pos, eh, ax_vel, ay_vel, az_vel)
+				return subgrid_array
 			else:
 				print "Error: averaged velocities do not match with position data!"
 
@@ -146,6 +144,41 @@ def avg_data_each_h(nof, lof, x_vel, y_vel, z_vel):
 	else:
 		print "Error: summed velocity data not matching!"
 
+def sub_grid(unique_x, unique_y, xpos, ypos, zpos, axvel, ayvel, azvel):
+	"""
+	Reduces data by subdividing our roi into n*n grids, with each grid containing the average
+	of the n*n velocities and positions.
+	"""
+	n = 3
+	ssgh_array = []
+
+	i = 0
+	while i < (len(xpos)):
+		sxp = 0
+		syp = 0
+		szp = 0
+		sxv = 0
+		syv = 0
+		szv = 0
+		if (i + n) < len(xpos) and (i + n + (n-1)*unique_y) < len(xpos):
+			for j in range(n):
+				for k in range(n):
+					sxp += xpos[i + j + (k*unique_y)]/sqr(n)
+					syp += ypos[i + j + (k*unique_y)]/sqr(n)
+					szp += zpos/sqr(n)
+					sxv += axvel[i + j + (k*unique_y)]/sqr(n)
+					syv += ayvel[i + j + (k*unique_y)]/sqr(n)
+					szv += azvel[i + j + (k*unique_y)]/sqr(n)
+		ssgh_array.append([sxp, syp, szp, sxv, syv, szv])
+		
+		if (i+n) < len(xpos): 
+				i += n
+		else:
+			pl = unique_y - (i % unique_y)
+			i += pl + ((n-1)*unique_y)
+
+	return np.array(ssgh_array)
+
 def arrays_to_plot(dict_array):
 	"""
 	Puts the dictionary-filled-array into plottable array.
@@ -164,12 +197,12 @@ def plot_vectors(pa):
 	X, Y, Z, U, V, W = zip(*pa)
 	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
-	ax.quiver(X, Y, Z, U, V, W, length=0.01)
+	ax.quiver(X, Y, Z, U, V, W, length=0.005)
 	plt.show()
 
 if __name__ == '__main__':
 
-	exp_h_list = [1,2,3,4,5,6,7,8]
+	exp_h_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
 	lehl = len(exp_h_list)
 
 	if lehl != 0:

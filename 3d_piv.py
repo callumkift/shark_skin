@@ -53,7 +53,7 @@ def get_data(eh, file_list):
 	y_pos = []
 	x_vel = []
 	y_vel = []
-	a_vel = []
+	z_vel = []
 
 	# reading data
 	for file in file_list:
@@ -69,13 +69,13 @@ def get_data(eh, file_list):
 						y_pos.append(float(column[1]))
 						x_vel.append(float(column[2]))
 						y_vel.append(float(column[3]))
-						# a_vel.append(math.sqrt(sqr(float(column[2])) + sqr(float(column[3]))))
-						a_vel.append(0.0)
+						# z_vel.append(math.sqrt(sqr(float(column[2])) + sqr(float(column[3]))))
+						z_vel.append(0.0)
 					else:
 						x_vel.append(float(column[2]))
 						y_vel.append(float(column[3]))
-						# a_vel.append(math.sqrt(sqr(float(column[2])) + sqr(float(column[3]))))
-						a_vel.append(0.0)
+						# z_vel.append(math.sqrt(sqr(float(column[2])) + sqr(float(column[3]))))
+						z_vel.append(0.0)
 				else:
 					print "Error: TXT file is not correct!"
 
@@ -83,10 +83,10 @@ def get_data(eh, file_list):
 	# and then returns an array with position and average velocities
 	if len(x_pos) == len(y_pos):
 		pos_count = len(x_pos)
-		if len(x_vel) == len(y_vel) and len(x_vel) == len(a_vel):
+		if len(x_vel) == len(y_vel) and len(x_vel) == len(z_vel):
 			vel_count = len(x_vel)
 			nof = vel_count/pos_count # equals number of files
-			ax_vel, ay_vel, aa_vel = avg_data_each_h(nof, pos_count, x_vel, y_vel, a_vel)
+			ax_vel, ay_vel, az_vel = avg_data_each_h(nof, pos_count, x_vel, y_vel, z_vel)
 
 			if len(ax_vel) == len(x_pos):
 				height_array = []
@@ -97,7 +97,7 @@ def get_data(eh, file_list):
 					row.append(eh)
 					row.append(ax_vel[i])
 					row.append(ay_vel[i])
-					row.append(aa_vel[i])
+					row.append(az_vel[i])
 					height_array.append(np.array(row))
 
 				height_array = np.array(height_array)
@@ -110,13 +110,15 @@ def get_data(eh, file_list):
 	else:
 		print "Error: not all x-positions have a corresponding y-position!"
 
-def avg_data_each_h(nof, lof, x_vel, y_vel, a_vel):
+def avg_data_each_h(nof, lof, x_vel, y_vel, z_vel):
 	"""
-	Averages the x-/y-/abs-velocities for each position at a certain height.
+	Averages the x-/y-/abs-velocities for each position at a certain height. Works by knowing
+	how long each data set is and adding the corresponding lines together, before dividing by
+	the number of data sets.
 	"""
 	sx_vel = []
 	sy_vel = []
-	sa_vel = []
+	sz_vel = []
 
 	for i in range(lof):
 		sx = 0
@@ -125,20 +127,20 @@ def avg_data_each_h(nof, lof, x_vel, y_vel, a_vel):
 		for j in range (nof):
 			sx += x_vel[i + (j*nof)]
 			sy += y_vel[i + (j*nof)]
-			sa += a_vel[i + (j*nof)]
+			sa += z_vel[i + (j*nof)]
 
 		sx_vel.append(sx)
 		sy_vel.append(sy)
-		sa_vel.append(sa)
+		sz_vel.append(sa)
 
 	# checks lengths match and then averages them and returns the average velocities
-	if len(sx_vel) == len(sy_vel) and len(sx_vel) == len(sa_vel):
+	if len(sx_vel) == len(sy_vel) and len(sx_vel) == len(sz_vel):
 		ax_vel = np.array(sx_vel)/nof
 		ay_vel = np.array(sy_vel)/nof
-		aa_vel = np.array(sa_vel)/nof
+		az_vel = np.array(sz_vel)/nof
 
-		if len(ax_vel) == len(ay_vel) and len(ax_vel) == len(aa_vel):
-			return ax_vel, ay_vel, aa_vel
+		if len(ax_vel) == len(ay_vel) and len(ax_vel) == len(az_vel):
+			return ax_vel, ay_vel, az_vel
 		else:
 			print "Error: averaged velocity data not matching!"
 	else:
@@ -148,43 +150,6 @@ def arrays_to_plot(dict_array):
 	"""
 	Puts the dictionary-filled-array into plottable array.
 	"""
-	# p_x = []
-	# p_y = []
-	# p_z = []
-	# p_xv = []
-	# p_yv = []
-	# p_zv = []
-
-	# for k in dict_array:
-	# 	for i in range(len(dict_array[k])):
-	# 		p_x.append(dict_array[k][i][0])
-	# 		p_y.append(dict_array[k][i][1])
-	# 		p_z.append(dict_array[k][i][2])
-	# 		p_xv.append(dict_array[k][i][3])
-	# 		p_yv.append(dict_array[k][i][4])
-	# 		p_zv.append(0)
-
-	# p_x = np.array(p_x)
-	# p_y = np.array(p_y)
-	# p_z = np.array(p_z)
-	# p_xv = np.array(p_xv)
-	# p_yv = np.array(p_yv)
-	# p_zv = np.array(p_zv)
-
-	# if np.size(p_x) == np.size(p_y) and np.size(p_x) == np.size(p_z):
-	# 	if np.size(p_xv) == np.size(p_yv) and np.size(p_xv) == np.size(p_zv):
-	# 		if np.size(p_x) == np.size(p_xv):
-	# 			if (np.size(p_x)/lehl) == len(dict_array[k]):
-	# 				return p_x, p_y, p_z, p_xv, p_yv, p_zv
-	# 			else:
-	# 				print "Error: not all data in plottable arrays"
-	# 		else:
-	# 			print "Error: plottable position and velocity arrays different length!"
-	# 	else:
-	# 		print "Error: plot velocity arrays different length!"
-	# else:
-	# 	print "Error: plot position arrays different length!"
-
 	plottable_array = []
 	for k in dict_array:
 		for i in range(len(dict_array[k])):
@@ -193,6 +158,9 @@ def arrays_to_plot(dict_array):
 	return np.array(plottable_array)
 
 def plot_vectors(pa):
+	"""
+	Plots a 3d vector graph
+	"""
 	X, Y, Z, U, V, W = zip(*pa)
 	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
@@ -232,9 +200,6 @@ if __name__ == '__main__':
 		pa = arrays_to_plot(h_pos_vel_dict)
 
 		plot_vectors(pa)
-
-
-
 
 	else:
 		print "Error: experimental height measurements not given!"

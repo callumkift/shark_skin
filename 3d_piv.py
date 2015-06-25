@@ -13,6 +13,7 @@ import os
 import collections
 import math
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import axes3d
 
 def sqr(a):
 	"""
@@ -107,10 +108,6 @@ def get_data(eh, file_list):
 	else:
 		print "Error: not all x-positions have a corresponding y-position!"
 
-	
-
-
-
 def avg_data_each_h(nof, lof, x_vel, y_vel, a_vel):
 	"""
 	Averages the x-/y-/abs-velocities for each position at a certain height.
@@ -145,12 +142,56 @@ def avg_data_each_h(nof, lof, x_vel, y_vel, a_vel):
 	else:
 		print "Error: summed velocity data not matching!"
 
+def arrays_to_plot(lehl, dict_array):
+	"""
+	Puts the dictionary-filled-array into plottable arrays.
+	"""
+	p_x = []
+	p_y = []
+	p_z = []
+	p_xv = []
+	p_yv = []
+	p_zv = []
+
+	for k in dict_array:
+		for i in range(len(dict_array[k])):
+			p_x.append(dict_array[k][i][0])
+			p_y.append(dict_array[k][i][1])
+			p_z.append(dict_array[k][i][2])
+			p_xv.append(dict_array[k][i][3])
+			p_yv.append(dict_array[k][i][4])
+			p_zv.append(0)
+
+	p_x = np.array(p_x)
+	p_y = np.array(p_y)
+	p_z = np.array(p_z)
+	p_xv = np.array(p_xv)
+	p_yv = np.array(p_yv)
+	p_zv = np.array(p_zv)
+
+	if np.size(p_x) == np.size(p_y) and np.size(p_x) == np.size(p_z):
+		if np.size(p_xv) == np.size(p_yv) and np.size(p_xv) == np.size(p_zv):
+			if np.size(p_x) == np.size(p_xv):
+				if (np.size(p_x)/lehl) == len(dict_array[k]):
+					return p_x, p_y, p_z, p_xv, p_yv, p_zv
+				else:
+					print "Error: not all data in plottable arrays"
+			else:
+				print "Error: plottable position and velocity arrays different length!"
+		else:
+			print "Error: plot velocity arrays different length!"
+	else:
+		print "Error: plot position arrays different length!"
+
+
+
 
 if __name__ == '__main__':
 
-	exp_h_list = []
+	exp_h_list = [1,2,3,4,5,6,7,8]
+	lehl = len(exp_h_list)
 
-	if len(exp_h_list) != 0:
+	if lehl != 0:
 
 		main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/20150609_x20_bdft_os/" #main dir where all the subdirs with the data are
 		sub_dirs = get_subdirectories(main_dir)
@@ -161,8 +202,8 @@ if __name__ == '__main__':
 			height_file_dict["height{0}".format(dir)]=get_files(dir)
 		height_file_dict = collections.OrderedDict(sorted(height_file_dict.items())) #sorts dictionary by subdir
 
-		if len(height_file_dict) == len(exp_h_list):
-			# Stores an array filled with position and velocities for each height
+		# Stores an array filled with position and velocities for each height
+		if len(height_file_dict) == lehl:
 			h_pos_vel_dict = {}
 			hcount = 1
 			for k in height_file_dict:
@@ -170,10 +211,9 @@ if __name__ == '__main__':
 				hcount += 1
 			h_pos_vel_dict = collections.OrderedDict(sorted(h_pos_vel_dict.items())) 
 
-			for k in h_pos_vel_dict:
-				print k, h_pos_vel_dict[k][0]
 		else:
 			print "Error: height list does not match number of subdirectories!"
+
 
 	else:
 		print "Error: experimental height measurements not given!"

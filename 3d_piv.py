@@ -1,4 +1,4 @@
- #!/usr/bin/env python
+#!/usr/bin/env python
 
 ###
 #
@@ -150,6 +150,12 @@ def sub_grid(unique_x, unique_y, xpos, ypos, zpos, axvel, ayvel, azvel):
 	of the n*n velocities and positions.
 	"""
 	print unique_x, unique_y, len(xpos), len(axvel)
+
+	# for i in range(100):
+	# 	print i, xpos[i], ypos[i]
+
+	# raw_input("")
+
 	n = sgs
 	ssgh_array = []
 
@@ -170,7 +176,7 @@ def sub_grid(unique_x, unique_y, xpos, ypos, zpos, axvel, ayvel, azvel):
 					sxv += axvel[i + j + (k*unique_y)]/sqr(n)
 					syv += ayvel[i + j + (k*unique_y)]/sqr(n)
 					szv += azvel[i + j + (k*unique_y)]/sqr(n)
-		ssgh_array.append([sxp, syp, szp, sxv, syv, szv])
+			ssgh_array.append([sxp, syp, szp, sxv, syv, szv])
 		
 		if (i+n) < len(xpos): 
 				i += n

@@ -149,7 +149,8 @@ def sub_grid(unique_x, unique_y, xpos, ypos, zpos, axvel, ayvel, azvel):
 	Reduces data by subdividing our roi into n*n grids, with each grid containing the average
 	of the n*n velocities and positions.
 	"""
-	n = 3
+	print unique_x, unique_y, len(xpos), len(axvel)
+	n = sgs
 	ssgh_array = []
 
 	i = 0
@@ -177,6 +178,7 @@ def sub_grid(unique_x, unique_y, xpos, ypos, zpos, axvel, ayvel, azvel):
 			pl = unique_y - (i % unique_y)
 			i += pl + ((n-1)*unique_y)
 
+	print np.array(ssgh_array).shape
 	return np.array(ssgh_array)
 
 def arrays_to_plot(dict_array):
@@ -202,8 +204,9 @@ def plot_vectors(pa):
 
 if __name__ == '__main__':
 
-	exp_h_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
+	exp_h_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0] # vertical heights of PIV
 	lehl = len(exp_h_list)
+	sgs = 3 # sub grid size
 
 	if lehl != 0:
 

@@ -86,6 +86,10 @@ def get_data(eh, file_list):
 				else:
 					print "Error: TXT file is not correct!"
 
+	if eh == exp_h_list[-1]:
+		print "All data read."
+
+
 	ux = len(unique_x)
 	uy = len(unique_y)
 
@@ -96,10 +100,12 @@ def get_data(eh, file_list):
 		if len(x_vel) == len(y_vel) and len(x_vel) == len(z_vel):
 			vel_count = len(x_vel)
 			nof = vel_count/pos_count # equals number of files
+			print "Averaging data ..."
 			ax_vel, ay_vel, az_vel = avg_data_each_h(nof, pos_count, x_vel, y_vel, z_vel)
 
 			if len(ax_vel) == len(x_pos):
 				if make_sg:
+					print "Making subgrids ..."
 					subgrid_array = sub_grid(ux, uy, x_pos, y_pos, eh, ax_vel, ay_vel, az_vel)
 					return subgrid_array
 				else:
@@ -197,7 +203,7 @@ def make_arrayarray(xpos, ypos, zpos, axvel, ayvel, azvel):
 
 	return np.array(aa)
 
-def arrays_to_plot(dict_array):
+def dict_to_array(dict_array):
 	"""
 	Puts the dictionary-filled-array into plottable array.
 	"""
@@ -208,7 +214,7 @@ def arrays_to_plot(dict_array):
 
 	return np.array(plottable_array)
 
-def plot_3d(pa):
+def plot_3d_vector(pa):
 	"""
 	Plots a 3d vector graph
 	"""
@@ -269,12 +275,12 @@ if __name__ == '__main__':
 
 		else:
 			print "Error: height list does not match number of subdirectories!"
-		print "finsihed reading."
+
 
 		# Turn the dictionary into plottable arrayslea
-		pa = arrays_to_plot(h_pos_vel_dict)
+		pa = dict_to_array(h_pos_vel_dict)
 
-		plot_3d(pa)
+		plot_3d_vector(pa)
 
 	else:
 		print "Error: experimental height measurements not given!"

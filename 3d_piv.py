@@ -99,8 +99,13 @@ def get_data(eh, file_list):
 			ax_vel, ay_vel, az_vel = avg_data_each_h(nof, pos_count, x_vel, y_vel, z_vel)
 
 			if len(ax_vel) == len(x_pos):
-				subgrid_array = sub_grid(ux, uy, x_pos, y_pos, eh, ax_vel, ay_vel, az_vel)
-				return subgrid_array
+				if make_sg:
+					subgrid_array = sub_grid(ux, uy, x_pos, y_pos, eh, ax_vel, ay_vel, az_vel)
+					return subgrid_array
+				else:
+					return make_arrayarray(x_pos, y_pos, eh, ax_vel, ay_vel, az_vel)
+
+				
 			else:
 				print "Error: averaged velocities do not match with position data!"
 
@@ -150,7 +155,6 @@ def sub_grid(unique_x, unique_y, xpos, ypos, zpos, axvel, ayvel, azvel):
 	Reduces data by subdividing our roi into n*n grids, with each grid containing the average
 	of the n*n velocities and positions.
 	"""
-	print unique_x, unique_y, len(xpos), len(axvel)
 
 	n = sgs
 	ssgh_array = []
@@ -180,8 +184,18 @@ def sub_grid(unique_x, unique_y, xpos, ypos, zpos, axvel, ayvel, azvel):
 			pl = unique_y - (i % unique_y)
 			i += pl + ((n-1)*unique_y)
 
-	print np.array(ssgh_array).shape
 	return np.array(ssgh_array)
+
+def make_arrayarray(xpos, ypos, zpos, axvel, ayvel, azvel):
+	"""
+	Puts the 1D arrays entered into an array of arrays
+	"""
+	aa = []
+
+	for i in range(len(xpos)):
+		aa.append([xpos[i], ypos[i], zpos, axvel[i], ayvel[i], azvel[i]])
+
+	return np.array(aa)
 
 def arrays_to_plot(dict_array):
 	"""
@@ -194,29 +208,43 @@ def arrays_to_plot(dict_array):
 
 	return np.array(plottable_array)
 
-def plot_vectors(pa):
+def plot_3d(pa):
 	"""
 	Plots a 3d vector graph
 	"""
+	# Changeable variables
+	al = 0.01 # arrow length
+	rgba = (0.3, 0.3, 0.3, 0.8) # rgba for panels
+	lw = 1.5 # changes thickness of arrow
+	
 	X, Y, Z, U, V, W = zip(*pa)
 	A = np.sqrt(np.power(X,2) + np.power(Y,2))
 
 	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
-	q = ax.quiver(X, Y, Z, U, V, W, A, length=0.005, arrow_length_ratio=0.9)
+	q = ax.quiver(X[::peo], Y[::peo], Z[::peo], U[::peo], V[::peo], W[::peo], A[::peo], length=al, lw=lw)
 	q.set_array(np.random.rand(100))
 	plt.colorbar(q)
-	ax.w_xaxis.set_pane_color((0.3,0.3,0.3,0.99))
-	ax.w_yaxis.set_pane_color((0.3,0.3,0.3,0.99))
-	ax.w_zaxis.set_pane_color((0.3,0.3,0.3,0.99))
+	ax.w_xaxis.set_pane_color(rgba)
+	ax.w_yaxis.set_pane_color(rgba)
+	ax.w_zaxis.set_pane_color(rgba)
 
 	plt.show()
 
 if __name__ == '__main__':
 
-	exp_h_list = [10.0, 15.0, 30.0, 40.0, 45.0, 60.0, 70.0, 80.0] # vertical heights of PIV
+	exp_h_list = [1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0] # vertical heights of PIV
 	lehl = len(exp_h_list)
-	sgs = 3 # sub grid size
+
+	sg_q = raw_input("Do you want to make sub-grids? (y/n)\n")
+	if sg_q == "y" or sg_q == "Y":
+		sgs = int(raw_input("What size do you want your sub-grids to be?\n"))
+		make_sg = True
+	else:
+		make_sg = False
+
+	peo = 5 # plots every x vector
+	# if not using subgrids, it is better for this != 1
 
 	if lehl != 0:
 
@@ -230,6 +258,7 @@ if __name__ == '__main__':
 		height_file_dict = collections.OrderedDict(sorted(height_file_dict.items())) #sorts dictionary by subdir
 
 		# Stores an array filled with position and velocities for each height
+		print "\nreading and manipulating data ..."
 		if len(height_file_dict) == lehl:
 			h_pos_vel_dict = {}
 			hcount = 1
@@ -240,12 +269,12 @@ if __name__ == '__main__':
 
 		else:
 			print "Error: height list does not match number of subdirectories!"
-
+		print "finsihed reading."
 
 		# Turn the dictionary into plottable arrayslea
 		pa = arrays_to_plot(h_pos_vel_dict)
 
-		plot_vectors(pa)
+		plot_3d(pa)
 
 	else:
 		print "Error: experimental height measurements not given!"

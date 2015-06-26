@@ -100,12 +100,10 @@ def get_data(eh, file_list):
 		if len(x_vel) == len(y_vel) and len(x_vel) == len(z_vel):
 			vel_count = len(x_vel)
 			nof = vel_count/pos_count # equals number of files
-			print "Averaging data ..."
 			ax_vel, ay_vel, az_vel = avg_data_each_h(nof, pos_count, x_vel, y_vel, z_vel)
 
 			if len(ax_vel) == len(x_pos):
 				if make_sg:
-					print "Making subgrids ..."
 					subgrid_array = sub_grid(ux, uy, x_pos, y_pos, eh, ax_vel, ay_vel, az_vel)
 					return subgrid_array
 				else:
@@ -237,8 +235,40 @@ def plot_3d_vector(pa):
 
 	plt.show()
 
+def vector_plots_2d(dicti):
+	"""
+	Creates single height (2D) arrays and sends them to be plotted 
+	"""
+	hcount = 0
+	for k in h_pos_vel_dict:
+		pa2d = []
+		for i in range(len(h_pos_vel_dict[k])):
+			if h_pos_vel_dict[k][i][2] == exp_h_list[hcount]:
+				pa2d.append([h_pos_vel_dict[k][i][0], h_pos_vel_dict[k][i][1], h_pos_vel_dict[k][i][3], h_pos_vel_dict[k][i][4]])
+		pa2d = np.array(pa2d)
+		plot_2d_vector(exp_h_list[hcount], pa2d)
+		hcount += 1
+
+def plot_2d_vector(eh, pa):
+	"""
+	Plots a 2D vector graph
+	"""
+	# Changeable variables
+
+	X, Y, U, V = zip(*pa)
+	A = np.sqrt(np.power(X,2) + np.power(Y,2))
+	fig = plt.quiver(X[::peo], Y[::peo], U[::peo], V[::peo], A)
+	plt.colorbar(fig)
+	plt.title(r"$\mu$-PIV vector plot at height %.3f, %s, %s" %(eh, shark_species, sample_area))
+
+	plt.show()
+
+
 if __name__ == '__main__':
 
+
+	shark_species = ""
+	sample_area = ""
 	exp_h_list = [1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0] # vertical heights of PIV
 	lehl = len(exp_h_list)
 
@@ -277,11 +307,12 @@ if __name__ == '__main__':
 			print "Error: height list does not match number of subdirectories!"
 
 
-		# Turn the dictionary into plottable arrayslea
-		pa = dict_to_array(h_pos_vel_dict)
 
+		pa = dict_to_array(h_pos_vel_dict)
 		plot_3d_vector(pa)
 
+		
+		vector_plots_2d(h_pos_vel_dict)
 	else:
 		print "Error: experimental height measurements not given!"
 

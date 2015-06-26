@@ -226,14 +226,18 @@ def plot_3d_vector(pa):
 
 	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
-	q = ax.quiver(X[::peo], Y[::peo], Z[::peo], U[::peo], V[::peo], W[::peo], A[::peo], length=al, lw=lw)
+	q = ax.quiver(X[::peo3], Y[::peo3], Z[::peo3], U[::peo3], V[::peo3], W[::peo3], A[::peo3], length=al, lw=lw)
 	q.set_array(np.random.rand(100))
 	plt.colorbar(q)
 	ax.w_xaxis.set_pane_color(rgba)
 	ax.w_yaxis.set_pane_color(rgba)
 	ax.w_zaxis.set_pane_color(rgba)
+	ax.set_zlabel("Height")
+	ax.set_title(r"$\mu$-PIV vector plot, %s, %s" %(shark_species, sample_area))
 
 	plt.show()
+
+
 
 def vector_plots_2d(dicti):
 	"""
@@ -254,18 +258,34 @@ def plot_2d_vector(eh, pa):
 	Plots a 2D vector graph
 	"""
 	# Changeable variables
+	mean_xvel, mean_yvel = get_2d_mean(pa)
 
 	X, Y, U, V = zip(*pa)
 	A = np.sqrt(np.power(X,2) + np.power(Y,2))
-	fig = plt.quiver(X[::peo], Y[::peo], U[::peo], V[::peo], A)
+	fig = plt.quiver(X[::peo2], Y[::peo2], U[::peo2], V[::peo2], A)
 	plt.colorbar(fig)
 	plt.title(r"$\mu$-PIV vector plot at height %.3f, %s, %s" %(eh, shark_species, sample_area))
-
+	plt.xlabel(r"Average velocity: %.3f $\bar{x}$ + %.3f $\bar{y}$ $ms^{-1}$" %(mean_xvel, mean_yvel))
 	plt.show()
+
+def get_2d_mean(pa):
+	"""
+	Returns the mean x-/y- velocity for 2D vector plot
+	"""
+	xvsum = []
+	yvsum = []
+
+	for i in range(len(pa)):
+		xvsum.append(pa[2])
+		yvsum.append(pa[3])
+
+	return np.mean(xvsum), np.mean(yvsum)
 
 
 if __name__ == '__main__':
 
+	main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/20150609_x20_bdft_os/" 
+	#main dir where all the subdirs with the data are
 
 	shark_species = ""
 	sample_area = ""
@@ -279,12 +299,11 @@ if __name__ == '__main__':
 	else:
 		make_sg = False
 
-	peo = 5 # plots every x vector
-	# if not using subgrids, it is better for this != 1
-
+	peo3 = 10 # plots every nth vector for 3D 
+	peo2 = 5 # plots every nth vector for 2D 
+	
 	if lehl != 0:
 
-		main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/20150609_x20_bdft_os/" #main dir where all the subdirs with the data are
 		sub_dirs = get_subdirectories(main_dir)
 		
 		# Store files of each subdir in a dictionary

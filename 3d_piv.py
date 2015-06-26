@@ -14,6 +14,7 @@ import collections
 import math
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.colors as mplc
 
 def sqr(a):
 	"""
@@ -151,11 +152,6 @@ def sub_grid(unique_x, unique_y, xpos, ypos, zpos, axvel, ayvel, azvel):
 	"""
 	print unique_x, unique_y, len(xpos), len(axvel)
 
-	# for i in range(100):
-	# 	print i, xpos[i], ypos[i]
-
-	# raw_input("")
-
 	n = sgs
 	ssgh_array = []
 
@@ -203,14 +199,22 @@ def plot_vectors(pa):
 	Plots a 3d vector graph
 	"""
 	X, Y, Z, U, V, W = zip(*pa)
+	A = np.sqrt(np.power(X,2) + np.power(Y,2))
+
 	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
-	ax.quiver(X, Y, Z, U, V, W, length=0.005)
+	q = ax.quiver(X, Y, Z, U, V, W, A, length=0.005, arrow_length_ratio=0.9)
+	q.set_array(np.random.rand(100))
+	plt.colorbar(q)
+	ax.w_xaxis.set_pane_color((0.3,0.3,0.3,0.99))
+	ax.w_yaxis.set_pane_color((0.3,0.3,0.3,0.99))
+	ax.w_zaxis.set_pane_color((0.3,0.3,0.3,0.99))
+
 	plt.show()
 
 if __name__ == '__main__':
 
-	exp_h_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0] # vertical heights of PIV
+	exp_h_list = [10.0, 15.0, 30.0, 40.0, 45.0, 60.0, 70.0, 80.0] # vertical heights of PIV
 	lehl = len(exp_h_list)
 	sgs = 3 # sub grid size
 

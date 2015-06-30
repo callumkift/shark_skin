@@ -3,7 +3,7 @@
 ###
 #
 # This script creates a 3D vector map using data from
-# the micro-PIV experiments. It averages over each hight
+# the micro-PIV experiments. It averages over each height
 # and combines this into a single graph
 #
 ###
@@ -24,7 +24,7 @@ def sqr(a):
 
 def get_subdirectories(a_dir):
 	"""
-	The input is a direcotry. Retrieves the sub-directories of the folder. Returns a list of
+	The input is a directory. Retrieves the sub-directories of the folder. Returns a list of
 	subdirectories.
 	"""
 	return [a_dir+name+"/" for name in os.listdir(a_dir)
@@ -265,7 +265,7 @@ def plot_2d_vector(eh, pa):
 	fig = plt.quiver(X[::peo2], Y[::peo2], U[::peo2], V[::peo2], A)
 	plt.colorbar(fig)
 	plt.title(r"$\mu$-PIV vector plot at height %.3f, %s, %s" %(eh, shark_species, sample_area))
-	plt.xlabel(r"Average velocity: %.3f $\bar{x}$ + %.3f $\bar{y}$ $ms^{-1}$" %(mean_xvel, mean_yvel))
+	plt.xlabel(r"Average velocity: (%.3f $\bar{x}$ + %.3f $\bar{y}$) $ms^{-1}$" %(mean_xvel, mean_yvel))
 	plt.show()
 
 def get_2d_mean(pa):
@@ -292,15 +292,11 @@ if __name__ == '__main__':
 	exp_h_list = [1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0] # vertical heights of PIV
 	lehl = len(exp_h_list)
 
-	sg_q = raw_input("Do you want to make sub-grids? (y/n)\n")
-	if sg_q == "y" or sg_q == "Y":
-		sgs = int(raw_input("What size do you want your sub-grids to be?\n"))
-		make_sg = True
-	else:
-		make_sg = False
+	make_sg = False
+	sgs = 3
 
-	peo3 = 10 # plots every nth vector for 3D 
-	peo2 = 5 # plots every nth vector for 2D 
+	peo3 = 15 # plots every nth vector for 3D 
+	peo2 = 2 # plots every nth vector for 2D 
 	
 	if lehl != 0:
 

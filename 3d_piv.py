@@ -241,8 +241,13 @@ def plot_3d_vector(pa):
 
 def vector_plots_2d(dicti):
 	"""
-	Creates single height (2D) arrays and sends them to be plotted 
+	Creates single height (2D) arrays and sends them to be plotted.
+	The plots include vector graphs for each height and an averaged velocity comparison for all
+	heights.
 	"""
+	mean_xs = []
+	mean_ys = []
+
 	hcount = 0
 	for k in h_pos_vel_dict:
 		pa2d = []
@@ -250,8 +255,14 @@ def vector_plots_2d(dicti):
 			if h_pos_vel_dict[k][i][2] == exp_h_list[hcount]:
 				pa2d.append([h_pos_vel_dict[k][i][0], h_pos_vel_dict[k][i][1], h_pos_vel_dict[k][i][3], h_pos_vel_dict[k][i][4]])
 		pa2d = np.array(pa2d)
-		plot_2d_vector(exp_h_list[hcount], pa2d)
+		mxv, myv = plot_2d_vector(exp_h_list[hcount], pa2d)
+		mean_xs.append(mxv)
+		mean_ys.append(myv)
 		hcount += 1
+
+	plot_2d_mean_roi(mean_xs, mean_ys)
+
+
 
 def plot_2d_vector(eh, pa):
 	"""
@@ -268,6 +279,8 @@ def plot_2d_vector(eh, pa):
 	plt.xlabel(r"Average velocity: (%.3f $\bar{x}$ + %.3f $\bar{y}$) $ms^{-1}$" %(mean_xvel, mean_yvel))
 	plt.show()
 
+	return mean_xvel, mean_yvel
+
 def get_2d_mean(pa):
 	"""
 	Returns the mean x-/y- velocity for 2D vector plot
@@ -281,6 +294,14 @@ def get_2d_mean(pa):
 
 	return np.mean(xvsum), np.mean(yvsum)
 
+def plot_2d_mean_roi(mxa, mya):
+	plt.plot(mxa, exp_h_list, 'o', label=r'<$v_x$>')
+	plt.plot(mya, exp_h_list, 'o', label=r'<$v_y$>')
+	plt.legend(loc=1)
+	plt.xlabel(r"Velocity ($ms^{-1}$)")
+	plt.ylabel("Height")
+	plt.title("Averaged velocity over roi")
+	plt.show()
 
 if __name__ == '__main__':
 

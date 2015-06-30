@@ -12,29 +12,31 @@ import os
 import collections
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D # Needed for 3D plot, 'projection=3d'
+
 
 
 def sqr(a):
 	"""
-    Returns the square of the input.
-    """
+	Returns the square of the input.
+	"""
 	return a * a
 
 
 def get_subdirectories(a_dir):
 	"""
-    The input is a directory. Retrieves the sub-directories of the folder. Returns a list of
-    subdirectories.
-    """
+	The input is a directory. Retrieves the sub-directories of the folder. Returns a list of
+	subdirectories.
+	"""
 	return [a_dir + name + "/" for name in os.listdir(a_dir)
 			if os.path.isdir(os.path.join(a_dir, name))]
 
 
 def get_files(a_dir):
 	"""
-    The input is a directory. Retrieves all txt files from the directory. Returns a list of
-    files
-    """
+	The input is a directory. Retrieves all txt files from the directory. Returns a list of
+	files
+	"""
 	gf = []
 	for file in os.listdir(dir):
 		if file.endswith(".txt"):
@@ -47,10 +49,10 @@ def get_files(a_dir):
 
 def get_data(eh, file_list):
 	"""
-    The input is a list of files. Reads all files from the list, averages the velocities for
-    each position and returns the position and height with their corresponding averaged
-    x-/y-/abs-velocities in an array.
-    """
+	The input is a list of files. Reads all files from the list, averages the velocities for
+	each position and returns the position and height with their corresponding averaged
+	x-/y-/abs-velocities in an array.
+	"""
 	x_pos = []
 	y_pos = []
 	x_vel = []
@@ -62,7 +64,7 @@ def get_data(eh, file_list):
 	# reading data
 	for file in file_list:
 		with open(file, 'r') as f:
-			header1 = f.readline()
+			f.readline()
 			for line in f:
 				line = line.strip()
 				column = line.split()
@@ -121,10 +123,10 @@ def get_data(eh, file_list):
 
 def avg_data_each_h(nof, lof, x_vel, y_vel, z_vel):
 	"""
-    Averages the x-/y-/abs-velocities for each position at a certain height. Works by knowing
-    how long each data set is and adding the corresponding lines together, before dividing by
-    the number of data sets.
-    """
+	Averages the x-/y-/abs-velocities for each position at a certain height. Works by knowing
+	how long each data set is and adding the corresponding lines together, before dividing by
+	the number of data sets.
+	"""
 	sx_vel = []
 	sy_vel = []
 	sz_vel = []
@@ -158,9 +160,9 @@ def avg_data_each_h(nof, lof, x_vel, y_vel, z_vel):
 
 def sub_grid(unique_x, unique_y, xpos, ypos, zpos, axvel, ayvel, azvel):
 	"""
-    Reduces data by subdividing our roi into n*n grids, with each grid containing the average
-    of the n*n velocities and positions.
-    """
+	Reduces data by subdividing our roi into n*n grids, with each grid containing the average
+	of the n*n velocities and positions.
+	"""
 
 	n = sgs
 	ssgh_array = []
@@ -195,8 +197,8 @@ def sub_grid(unique_x, unique_y, xpos, ypos, zpos, axvel, ayvel, azvel):
 
 def make_arrayarray(xpos, ypos, zpos, axvel, ayvel, azvel):
 	"""
-    Puts the 1D arrays entered into an array of arrays
-    """
+	Puts the 1D arrays entered into an array of arrays
+	"""
 	aa = []
 
 	for i in range(len(xpos)):
@@ -207,8 +209,8 @@ def make_arrayarray(xpos, ypos, zpos, axvel, ayvel, azvel):
 
 def dict_to_array(dict_array):
 	"""
-    Puts the dictionary-filled-array into plottable array.
-    """
+	Puts the dictionary-filled-array into plottable array.
+	"""
 	plottable_array = []
 	for k in dict_array:
 		for i in range(len(dict_array[k])):
@@ -219,8 +221,8 @@ def dict_to_array(dict_array):
 
 def plot_3d_vector(pa):
 	"""
-    Plots a 3d vector graph
-    """
+	Plots a 3d vector graph
+	"""
 	# Changeable variables
 	al = 0.01  # arrow length
 	rgba = (0.3, 0.3, 0.3, 0.8)  # rgba for panels
@@ -246,10 +248,10 @@ def plot_3d_vector(pa):
 
 def vector_plots_2d(dicti):
 	"""
-    Creates single height (2D) arrays and sends them to be plotted.
-    The plots include vector graphs for each height and an averaged velocity comparison for all
-    heights.
-    """
+	Creates single height (2D) arrays and sends them to be plotted.
+	The plots include vector graphs for each height and an averaged velocity comparison for all
+	heights.
+	"""
 	mean_xs = []
 	mean_ys = []
 
@@ -272,8 +274,8 @@ def vector_plots_2d(dicti):
 
 def plot_2d_vector(eh, pa):
 	"""
-    Plots a 2D vector graph
-    """
+	Plots a 2D vector graph
+	"""
 	# Changeable variables
 	mean_xvel, mean_yvel = get_2d_mean(pa)
 
@@ -291,8 +293,8 @@ def plot_2d_vector(eh, pa):
 
 def get_2d_mean(pa):
 	"""
-    Returns the mean x-/y- velocity for 2D vector plot
-    """
+	Returns the mean x-/y- velocity for 2D vector plot
+	"""
 	xvsum = []
 	yvsum = []
 
@@ -315,12 +317,12 @@ def plot_2d_mean_roi(mxa, mya):
 
 if __name__ == '__main__':
 
-	main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/20150609_x20_bdft_os_woc/"
+	main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/tail_test/"
 	# main dir where all the subdirs with the data are
 
 	shark_species = ""
 	sample_area = ""
-	exp_h_list = [-2.5485, -2.3719, -2.2914, -2.2380, -2.1518, -2.0685]  # vertical heights of PIV
+	exp_h_list = np.array([-2.4260, -2.4162, -2.4002, -2.3820, -2.3692, -2.3499, -2.3379, -2.2970])  # vertical heights of PIV
 	lehl = len(exp_h_list)
 
 	make_sg = False
@@ -351,13 +353,15 @@ if __name__ == '__main__':
 				hcount += 1
 			h_pos_vel_dict = collections.OrderedDict(sorted(h_pos_vel_dict.items()))
 
+			pa = dict_to_array(h_pos_vel_dict)
+			plot_3d_vector(pa)
+
+			vector_plots_2d(h_pos_vel_dict)
+
 		else:
 			print "Error: height list does not match number of subdirectories!"
 
-		pa = dict_to_array(h_pos_vel_dict)
-		plot_3d_vector(pa)
 
-		vector_plots_2d(h_pos_vel_dict)
 	else:
 		print "Error: experimental height measurements not given!"
 

@@ -37,9 +37,9 @@ def get_files(a_dir):
     files
     """
 	gf = []
-	for file in os.listdir(dir):
+	for file in os.listdir(a_dir):
 		if file.endswith(".txt"):
-			gf.append(dir + "/" + str(file))
+			gf.append(a_dir + "/" + str(file))
 	if len(gf) != 0:
 		return gf
 	else:
@@ -57,7 +57,6 @@ def get_data(eh, file_list):
 	x_vel = []
 	y_vel = []
 	z_vel = []
-	unique_x = []
 	unique_y = []
 
 	# reading data
@@ -77,8 +76,6 @@ def get_data(eh, file_list):
 						y_vel.append(float(column[3]))
 						z_vel.append(0.0)
 
-						if float(column[0]) not in unique_x:
-							unique_x.append(float(column[0]))
 						if float(column[1]) not in unique_y:
 							unique_y.append(float(column[1]))
 					else:
@@ -228,9 +225,9 @@ def plot_3d_vector(pa):
 
 	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
-	q = ax.quiver(X[::peo3], Y[::peo3], Z[::peo3], U[::peo3], V[::peo3], W[::peo3], A[::peo3],
+	q = ax.quiver(X[::peo3], Y[::peo3], Z[::peo3], U[::peo3], V[::peo3], W[::peo3], A,
 				  length=al, lw=lw)
-	q.set_array(np.random.rand(100))
+	q.set_array(np.random.rand(10))
 	plt.colorbar(q)
 	ax.w_xaxis.set_pane_color(rgba)
 	ax.w_yaxis.set_pane_color(rgba)
@@ -273,7 +270,7 @@ def plot_2d_vector(eh, pa):
     """
 
 	X, Y, U, V = zip(*pa)
-	A = np.sqrt(np.power(X, 2) + np.power(Y, 2))
+	A = np.sqrt(np.power(X, 2.0) + np.power(Y, 2.0))
 	fig = plt.quiver(X[::peo2], Y[::peo2], U[::peo2], V[::peo2], A)
 	plt.colorbar(fig)
 	plt.title(r"$\mu$-PIV vector plot at height %.3f, %s, %s" % (eh, shark_species, sample_area))
@@ -307,6 +304,8 @@ if __name__ == '__main__':
 	make_sg = False
 	sgs = 3
 
+	plot3D = False
+
 	peo3 = 15  # plots every nth vector for 3D
 	peo2 = 2  # plots every nth vector for 2D
 
@@ -332,8 +331,9 @@ if __name__ == '__main__':
 				hcount += 1
 			h_pos_vel_dict = collections.OrderedDict(sorted(h_pos_vel_dict.items()))
 
-			pa = dict_to_array(h_pos_vel_dict)
-			plot_3d_vector(pa)
+			if plot3D:
+				pa = dict_to_array(h_pos_vel_dict)
+				plot_3d_vector(pa)
 
 			vector_plots_2d(h_pos_vel_dict)
 

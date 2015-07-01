@@ -103,7 +103,8 @@ def get_data(eh, file_list):
 				subgrid_array = sub_grid(uy, x_pos, y_pos, eh, ax_vel, ay_vel, az_vel)
 				return subgrid_array
 			else:
-				return make_arrayarray(x_pos, y_pos, eh, ax_vel, ay_vel, az_vel)
+				z_pos = [eh] * len(x_pos)
+				return zip(x_pos, y_pos, z_pos, ax_vel, ay_vel, az_vel)
 
 
 		else:
@@ -187,17 +188,6 @@ def sub_grid(unique_y, xpos, ypos, zpos, axvel, ayvel, azvel):
 	return np.array(ssgh_array) / sqr(n)
 
 
-def make_arrayarray(xpos, ypos, zpos, axvel, ayvel, azvel):
-	"""
-    Puts the 1D arrays entered into an array of arrays
-    """
-	aa = []
-
-	for i in range(len(xpos)):
-		aa.append([xpos[i], ypos[i], zpos, axvel[i], ayvel[i], azvel[i]])
-
-	return np.array(aa)
-
 
 def dict_to_array(dict_array):
 	"""
@@ -246,7 +236,6 @@ def vector_plots_2d(dicti):
     """
 	mean_xs = []
 	mean_ys = []
-
 	hcount = 0
 	for k in dicti:
 		pa2d = []
@@ -293,12 +282,12 @@ def plot_2d_mean_roi(mxa, mya):
 
 if __name__ == '__main__':
 
-	main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/empty_test/"
+	main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/tail_test/"
 	# main dir where all the subdirs with the data are
 
 	shark_species = ""
 	sample_area = ""
-	exp_h_list = np.array([-2.4234, -2.3041, -2.1854, -2.0239, -1.9592])  # vertical heights of PIV
+	exp_h_list = np.array([-2.4260, -2.4162, -2.4002, -2.3820, -2.3692, -2.3499, -2.3379, -2.2970])  # vertical heights of PIV
 	lehl = len(exp_h_list)
 
 	make_sg = False

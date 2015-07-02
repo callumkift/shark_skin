@@ -256,6 +256,9 @@ def vector_plots_2d(dicti):
     """
     mean_xs = []
     mean_ys = []
+    err_xs = []
+    err_ys = []
+
     hcount = 0
     for k in dicti:
         pa2d = []
@@ -265,12 +268,14 @@ def vector_plots_2d(dicti):
                     [dicti[k][i][0], dicti[k][i][1], dicti[k][i][3],
                      dicti[k][i][4]])
         pa2d = np.array(pa2d)
-        mxv, myv = plot_2d_vector(exp_h_list[hcount], pa2d)
+        mxv, myv, errxv, erryv = plot_2d_vector(exp_h_list[hcount], pa2d)
         mean_xs.append(mxv)
         mean_ys.append(myv)
+        err_xs.append(errxv)
+        err_ys.append(erryv)
         hcount += 1
 
-    plot_2d_mean_roi(mean_xs, mean_ys)
+    plot_2d_mean_roi(mean_xs, mean_ys, err_xs, err_ys)
 
 
 def plot_2d_vector(eh, pa):
@@ -289,14 +294,31 @@ def plot_2d_vector(eh, pa):
             r"Average velocity: (%.3f $\bar{x}$ + %.3f $\bar{y}$) $ms^{-1}$" % (np.mean(U), np.mean(V)))
         plt.show()
 
-    return np.mean(U), np.mean(V)
+    if sem_bar:
+        return np.mean(U), np.mean(V), np.std(U) / np.size(U), np.std(V) / np.size(V)
+    elif sd_bar:
+        return np.mean(U), np.mean(V), np.std(U), np.std(V)
 
 
-def plot_2d_mean_roi(mxa, mya):
-    plt.plot(mxa, exp_h_list, 'o', label=r'<$v_x$>')
-    plt.plot(mya, exp_h_list, 'o', label=r'<$v_y$>')
+def plot_2d_mean_roi(mxa, mya, errx, erry):
+    """
+    Plots the mean velocity for each height, with error bars.
+    :param mxa: array containing mean x-velocity for each height
+    :param mya: array containing mean y-velocity for each height
+    :param errx: array containing error on mxa
+    :param erry: array containing error on mxa
+    :return: n/a
+    """
+    plt.errorbar(mxa, exp_h_list, xerr=errx, marker='o', label=r'<$v_x$>')
+    plt.errorbar(mya, exp_h_list, xerr=erry, marker='o', label=r'<$v_y$>')
+    plt.plot([0.0, 0.0], [np.amin(exp_h_list), np.amax(exp_h_list)], 'k-')
     plt.legend(loc=2)
-    plt.xlabel(r"Velocity ($ms^{-1}$)")
+
+    if sem_bar:
+        plt.xlabel(r"Velocity ($ms^{-1}$), $\pm$sem")
+    elif sd_bar:
+        plt.xlabel(r"Velocity ($ms^{-1}$), $\pm$sd")
+
     plt.ylabel("Height")
     plt.title("Averaged velocity over roi")
     plt.show()
@@ -321,44 +343,52 @@ if __name__ == '__main__':
     plot2D = False # True -> plots 2D vector plots for all heights
     peo2 = 3  # plots every nth vector for the 2D plot
 
-    if lehl != 0:
+    # At least one must be True
+    sem_bar = False # plots standard error on mean bars on 2d_mean_roi graph
+    sd_bar = True # plot standard deviation bars on 2d_mean_roi graph
+    # If both true, sem will be plotted
 
-        sub_dirs = get_subdirectories(main_dir)
+    if sem_bar or sd_bar:
+        if lehl != 0:
 
-        # Store files of each subdir in a dictionary
-        height_file_dict = {}
-        for dir in sub_dirs:
-            height_file_dict["height{0}".format(dir)] = get_files(dir)
-        height_file_dict = collections.OrderedDict(
-            sorted(height_file_dict.items()))  # sorts dictionary by subdir
+            sub_dirs = get_subdirectories(main_dir)
+
+            # Store files of each subdir in a dictionary
+            height_file_dict = {}
+            for dir in sub_dirs:
+                height_file_dict["height{0}".format(dir)] = get_files(dir)
+            height_file_dict = collections.OrderedDict(
+                sorted(height_file_dict.items()))  # sorts dictionary by subdir
 
 
 
-        # Stores an array filled with position and velocities for each height
-        if len(height_file_dict) == lehl:
-            print "\nreading and manipulating data ..."
-            h_pos_vel_dict = {}
-            hcount = 0
-            for k in height_file_dict:
+            # Stores an array filled with position and velocities for each height
+            if len(height_file_dict) == lehl:
+                print "\nreading and manipulating data ..."
+                h_pos_vel_dict = {}
+                hcount = 0
+                for k in height_file_dict:
 
-                # Avoids bug when more than 10 height measurements
-                if hcount < 10:
-                    fhc = "0" + str(hcount)
-                else:
-                    fhc = str(hcount)
+                    # Avoids bug when more than 10 height measurements
+                    if hcount < 10:
+                        fhc = "0" + str(hcount)
+                    else:
+                        fhc = str(hcount)
 
-                h_pos_vel_dict["height{0}".format(fhc)] = get_data(exp_h_list[hcount],
-                                                                      height_file_dict[k])
-                hcount += 1
-            h_pos_vel_dict = collections.OrderedDict(sorted(h_pos_vel_dict.items()))
+                    h_pos_vel_dict["height{0}".format(fhc)] = get_data(exp_h_list[hcount],
+                                                                          height_file_dict[k])
+                    hcount += 1
+                h_pos_vel_dict = collections.OrderedDict(sorted(h_pos_vel_dict.items()))
 
-            if plot3D:
-                pa = dict_to_array(h_pos_vel_dict)
-                plot_3d_vector(pa)
+                if plot3D:
+                    pa = dict_to_array(h_pos_vel_dict)
+                    plot_3d_vector(pa)
 
-            vector_plots_2d(h_pos_vel_dict)
+                vector_plots_2d(h_pos_vel_dict)
 
+            else:
+                print "\nError: height list does not match number of subdirectories containing files!"
         else:
-            print "\nError: height list does not match number of subdirectories containing files!"
+            print "\nError: experimental height measurements not given!"
     else:
-        print "\nError: experimental height measurements not given!"
+        print "\nError: please choose which error bars to plot"

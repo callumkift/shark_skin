@@ -279,20 +279,22 @@ def plot_2d_vector(eh, pa):
     """
 
     X, Y, U, V = zip(*pa)
-    A = np.sqrt(np.power(X, 2.0) + np.power(Y, 2.0))
-    fig = plt.quiver(X[::peo2], Y[::peo2], U[::peo2], V[::peo2], A)
-    plt.colorbar(fig)
-    plt.title(r"$\mu$-PIV vector plot at height %.3f, %s, %s" % (eh, shark_species, sample_area))
-    plt.xlabel(
-        r"Average velocity: (%.3f $\bar{x}$ + %.3f $\bar{y}$) $ms^{-1}$" % (np.mean(U), np.mean(V)))
-    plt.show()
+
+    if plot2D:
+        A = np.sqrt(np.power(X, 2.0) + np.power(Y, 2.0))
+        fig = plt.quiver(X[::peo2], Y[::peo2], U[::peo2], V[::peo2], A)
+        plt.colorbar(fig)
+        plt.title(r"$\mu$-PIV vector plot at height %.3f, %s, %s" % (eh, shark_species, sample_area))
+        plt.xlabel(
+            r"Average velocity: (%.3f $\bar{x}$ + %.3f $\bar{y}$) $ms^{-1}$" % (np.mean(U), np.mean(V)))
+        plt.show()
 
     return np.mean(U), np.mean(V)
 
 
 def plot_2d_mean_roi(mxa, mya):
-    plt.plot(mxa, exp_h_list, 'o-', label=r'<$v_x$>')
-    plt.plot(mya, exp_h_list, 'o-', label=r'<$v_y$>')
+    plt.plot(mxa, exp_h_list, 'o', label=r'<$v_x$>')
+    plt.plot(mya, exp_h_list, 'o', label=r'<$v_y$>')
     plt.legend(loc=2)
     plt.xlabel(r"Velocity ($ms^{-1}$)")
     plt.ylabel("Height")
@@ -310,12 +312,13 @@ if __name__ == '__main__':
     exp_h_list = read_hf()  # vertical heights of PIV
     lehl = len(exp_h_list)
 
-    make_sg = False
+    make_sg = False # True -> makes subgrids
     sgs = 3
 
-    plot3D = False
-
+    plot3D = False # True -> plots 3D vector
     peo3 = 10  # plots every nth vector for the 3D plot
+
+    plot2D = False # True -> plots 2D vector plots for all heights
     peo2 = 3  # plots every nth vector for the 2D plot
 
     if lehl != 0:

@@ -293,7 +293,7 @@ def plot_2d_vector(eh, pa):
 def plot_2d_mean_roi(mxa, mya):
     plt.plot(mxa, exp_h_list, 'o-', label=r'<$v_x$>')
     plt.plot(mya, exp_h_list, 'o-', label=r'<$v_y$>')
-    plt.legend(loc=1)
+    plt.legend(loc=2)
     plt.xlabel(r"Velocity ($ms^{-1}$)")
     plt.ylabel("Height")
     plt.title("Averaged velocity over roi")
@@ -337,7 +337,14 @@ if __name__ == '__main__':
             h_pos_vel_dict = {}
             hcount = 0
             for k in height_file_dict:
-                h_pos_vel_dict["height{0}".format(hcount)] = get_data(exp_h_list[hcount],
+
+                # Avoids bug when more than 10 height measurements
+                if hcount < 10:
+                    fhc = "0" + str(hcount)
+                else:
+                    fhc = str(hcount)
+
+                h_pos_vel_dict["height{0}".format(fhc)] = get_data(exp_h_list[hcount],
                                                                       height_file_dict[k])
                 hcount += 1
             h_pos_vel_dict = collections.OrderedDict(sorted(h_pos_vel_dict.items()))

@@ -309,17 +309,19 @@ def plot_2d_mean_roi(mxa, mya, errx, erry):
     :param erry: array containing error on mxa
     :return: n/a
     """
-    plt.errorbar(mxa, exp_h_list, xerr=errx, marker='o', label=r'<$v_x$>')
-    plt.errorbar(mya, exp_h_list, xerr=erry, marker='o', label=r'<$v_y$>')
-    plt.plot([0.0, 0.0], [np.amin(exp_h_list), np.amax(exp_h_list)], 'k-')
-    plt.legend(loc=2)
+    height_plot = np.array(abs(exp_h_list) - np.amin(abs(exp_h_list)))
+    plt.errorbar(mxa, height_plot, xerr=errx, marker='o',
+                 label=r'<$v_x$>')
+    plt.errorbar(mya, height_plot, xerr=erry, marker='o', label=r'<$v_y$>')
+    plt.plot([0.0, 0.0], [np.amin(height_plot), np.amax(height_plot)], 'k-')
+    plt.legend(loc=3)
 
     if sem_bar:
         plt.xlabel(r"Velocity ($ms^{-1}$), $\pm$sem")
     elif sd_bar:
         plt.xlabel(r"Velocity ($ms^{-1}$), $\pm$sd")
 
-    plt.ylabel("Height")
+    plt.ylabel("Height from dermal dentical")
     plt.title("Averaged velocity over roi")
     plt.show()
 

@@ -278,7 +278,7 @@ def plot_3d_vector(pa):
     plt.show()
 
 
-def plots_2d(dicti):
+def plot_2d_vector(dicti):
     """
     Produces all the 2D plots from the given dictionary. These plots are the 2D vector
     plots and the mean velocity for each height.
@@ -286,10 +286,6 @@ def plots_2d(dicti):
                     [x_position, y_pos, z_pos x_velocity, y_vel, z_vel]
     :return: n/a
     """
-    mean_xs = []
-    mean_ys = []
-    err_xs = []
-    err_ys = []
 
     hcount = 0
     for k in dicti:
@@ -299,68 +295,20 @@ def plots_2d(dicti):
                 pa2d.append(
                     [dicti[k][i][0], dicti[k][i][1], dicti[k][i][3],
                      dicti[k][i][4]])
-        pa2d = np.array(pa2d)
-        mxv, myv, errxv, erryv = plot_2d_vector(exp_h_list[hcount], pa2d)
-        mean_xs.append(mxv)
-        mean_ys.append(myv)
-        err_xs.append(errxv)
-        err_ys.append(erryv)
-        hcount += 1
 
-    plot_2d_mean_roi(mean_xs, mean_ys, err_xs, err_ys)
-
-
-def plot_2d_vector(eh, pa):
-    """
-    Plots a 2D vector graph for each height
-    :param eh: experimental height
-    :param pa: Array containing [x_position, y_position, x_velocity, y_velocity]
-    :return: Mean velocities and their errors
-    """
-
-    X, Y, U, V = zip(*pa)
-
-    if plot2D:
+        X, Y, U, V = zip(*pa2d)
         A = np.sqrt(np.power(X, 2.0) + np.power(Y, 2.0))
         fig = plt.quiver(X[::peo2], Y[::peo2], U[::peo2], V[::peo2], A)
         plt.colorbar(fig)
         plt.title(
-            r"$\mu$-PIV vector plot at height %.3f, %s, %s" % (eh, shark_species, sample_area))
+            r"$\mu$-PIV vector plot at height %.3f, %s, %s" % (exp_h_list[hcount], shark_species,
+                                                               sample_area))
         plt.xlabel(
             r"Average velocity: (%.3f $\bar{x}$ + %.3f $\bar{y}$) $ms^{-1}$" % (
             np.mean(U), np.mean(V)))
         plt.show()
 
-    if sem_bar:
-        return np.mean(U), np.mean(V), np.std(U) / np.size(U), np.std(V) / np.size(V)
-    elif sd_bar:
-        return np.mean(U), np.mean(V), np.std(U), np.std(V)
-
-
-def plot_2d_mean_roi(mxa, mya, errx, erry):
-    """
-    Plots the mean velocity for each height, with error bars.
-    :param mxa: array containing mean x-velocity for each height
-    :param mya: array containing mean y-velocity for each height
-    :param errx: array containing error on mxa
-    :param erry: array containing error on mxa
-    :return: n/a
-    """
-    height_plot = np.array(abs(exp_h_list) - np.amin(abs(exp_h_list)))
-    plt.errorbar(mxa, height_plot, xerr=errx, marker='o',
-                 label=r'<$v_x$>')
-    plt.errorbar(mya, height_plot, xerr=erry, marker='o', label=r'<$v_y$>')
-    plt.plot([0.0, 0.0], [np.amin(height_plot), np.amax(height_plot)], 'k-')
-    plt.legend(loc=3)
-
-    if sem_bar:
-        plt.xlabel(r"Velocity ($ms^{-1}$), $\pm$sem")
-    elif sd_bar:
-        plt.xlabel(r"Velocity ($ms^{-1}$), $\pm$sd")
-
-    plt.ylabel("Height from dermal dentical")
-    plt.title("Averaged velocity, %s, %s" %(shark_species, sample_area))
-    plt.show()
+        hcount += 1
 
 
 def plane_plots(xpv, ypv, dicti):
@@ -385,8 +333,8 @@ def plane_plots(xpv, ypv, dicti):
     xzx, xzz, xzxv, xzzv = zip(*xz)
     yzy, yzz, yzyv, yzzv = zip(*yz)
 
-    axv = mean_vel(xzxv, xzz)
-    ayv = mean_vel(yzyv, yzz)
+    axv, exv= mean_vel(xzxv, xzz)
+    ayv, eyv = mean_vel(yzyv, yzz)
 
     dfdd = np.array(abs(exp_h_list) - np.amin(abs(exp_h_list)))
     xzz = np.array(abs(np.array(xzz)) - np.amin(abs(np.array(xzz))))
@@ -395,12 +343,11 @@ def plane_plots(xpv, ypv, dicti):
     f, axarr = plt.subplots(2,2, sharey=True)
 
     fig = axarr[0,0].quiver(xzx, xzz, xzxv, xzzv, yzyv)
+    # Colour uses yzyv so that it matches the other plot
     axarr[0,0].set_xlabel("x")
     axarr[0,0].set_ylabel(r"Height from dd ($mm$)")
-    # axarr[0,0].set_title("x-z plane, x-velocity")
-    # f.colorbar(fig, ax=axarr[0,0]) # colorbar is set using xzxv and references both plots
 
-    axarr[0,1].plot(axv, dfdd, 'go-')
+    axarr[0,1].errorbar(axv, dfdd, xerr=exv, marker='o', color='g')
     axarr[0,1].plot([0.0, 0.0], [np.amin(dfdd), np.amax(dfdd)], 'k--')
     axarr[0,1].set_xlabel(r"x-velocity ($ms^{-1}$)")
 
@@ -409,18 +356,20 @@ def plane_plots(xpv, ypv, dicti):
     axarr[1,0].set_xlabel("y")
     axarr[1,0].set_ylabel(r"Height from dd ($mm$)")
 
-    axarr[1,1].plot(ayv, dfdd, 'bo-')
+    axarr[1,1].errorbar(ayv, dfdd, xerr=eyv, marker='o', color='b')
     axarr[1,1].plot([0.0, 0.0], [np.amin(dfdd), np.amax(dfdd)], 'k--')
     axarr[1,1].set_xlabel(r"y-velocity ($ms^{-1}$)")
 
     cax, kw = mpl.colorbar.make_axes([ax for ax in axarr.flat])
     f.colorbar(fig, cax=cax, **kw)
+    f.suptitle(r"$\mu$-PIV for the %s (%s)" %(shark_species, sample_area))
     plt.show()
 
 
 def mean_vel(vel_array, z_array):
 
     ava = []
+    eva = []
 
     for i in range(len(exp_h_list)):
         va = []
@@ -429,8 +378,12 @@ def mean_vel(vel_array, z_array):
                 va.append(vel_array[j])
 
         ava.append(np.mean(va))
+        eva.append(np.std(va))
 
-    return np.array(ava)
+    if sem_bar:
+        return np.array(ava), np.array(eva) / len(eva)
+    elif sd_bar:
+        return np.array(ava), np.array(eva)
 
 
 
@@ -451,7 +404,7 @@ if __name__ == '__main__':
     peo3 = 10  # plots every nth vector for the 3D plot
 
     plot2D = False  # True -> plots 2D vector plots for all heights
-    peo2 = 3  # plots every nth vector for the 2D plot
+    peo2 = 2  # plots every nth vector for the 2D plot
 
     # At least one must be True
     sem_bar = True  # plots standard error on mean bars on 2d_mean_roi graph
@@ -498,8 +451,10 @@ if __name__ == '__main__':
                     pa = dict_to_array(h_pos_vel_dict)
                     plot_3d_vector(pa)
 
-                # plots_2d(h_pos_vel_dict)
                 plane_plots(midx, midy, h_pos_vel_dict)
+
+                if plot2D:
+                    plot_2d_vector(h_pos_vel_dict)
             else:
                 print "\nError: height list does not match number of subdirectories containing files!"
         else:

@@ -382,7 +382,7 @@ def xzplane_plot(ypv, dicti):
     plt.colorbar(fig)
     plt.title("X-Z plane")
     plt.xlabel("X")
-    plt.ylabel("Z")
+    plt.ylabel("Z", rotation = 0)
     plt.show()
 
 
@@ -406,9 +406,37 @@ def yzplane_plot(xpv, dicti):
     plt.colorbar(fig)
     plt.title("Y-Z plane")
     plt.xlabel("Y")
-    plt.ylabel("Z")
+    plt.ylabel("Z", rotation=0)
     plt.show()
 
+
+def alt_plane_plots(xpv, ypv, dicti):
+
+    xz = []
+    yz = []
+
+    for k in dicti:
+        for i in range(len(dicti[k])):
+            if dicti[k][i][1] == ypv:
+                xz.append([dicti[k][i][0], dicti[k][i][2], dicti[k][i][4], dicti[k][i][5]])
+            if dicti[k][i][0] == xpv:
+                yz.append([dicti[k][i][1], dicti[k][i][2], dicti[k][i][4], dicti[k][i][5]])
+
+    xzx, xzz, xzxv, xzzv = zip(*xz)
+    yzy, yzz, yzyv, yzzv = zip(*yz)
+
+    f, axarr = plt.subplots(1, 2, sharey = True)
+
+    fig = axarr[0].quiver(xzx, xzz, xzxv, xzzv, yzyv)
+    f.colorbar(fig) # colorbar is set using yzyv and references both plots
+    axarr[1].quiver(yzy, yzz, yzyv, yzzv, yzyv)
+
+    axarr[0].set_xlabel("x")
+    axarr[0].set_ylabel("z", rotation=0)
+    axarr[0].set_title("x-z plane, x-velocity")
+    axarr[1].set_xlabel("y")
+    axarr[1].set_title("y-z plane, y-velocity")
+    plt.show()
 
 if __name__ == '__main__':
 
@@ -475,8 +503,9 @@ if __name__ == '__main__':
                     plot_3d_vector(pa)
 
                 plots_2d(h_pos_vel_dict)
-                xzplane_plot(midy, h_pos_vel_dict)
-                yzplane_plot(midx, h_pos_vel_dict)
+                # xzplane_plot(midy, h_pos_vel_dict)
+                # yzplane_plot(midx, h_pos_vel_dict)
+                alt_plane_plots(midx, midy, h_pos_vel_dict)
             else:
                 print "\nError: height list does not match number of subdirectories containing files!"
         else:

@@ -17,6 +17,7 @@ import os
 import collections
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D  # Needed for 3D plot, 'projection=3d'
 
 
@@ -362,15 +363,22 @@ def plot_2d_mean_roi(mxa, mya, errx, erry):
     plt.show()
 
 
-def alt_plane_plots(xpv, ypv, dicti):
-
+def plane_plots(xpv, ypv, dicti):
+    """
+    Makes planar vector plots of the xz- and yz-planes
+    :param xpv: x-position for yz-plane
+    :param ypv: y-position for xz-plane
+    :param dicti: Dictionary; for each height there is a corresponding array of
+                    [x_position, y_pos, z_pos x_velocity, y_vel, z_vel]
+    :return: n/a
+    """
     xz = []
     yz = []
 
     for k in dicti:
         for i in range(len(dicti[k])):
             if dicti[k][i][1] == ypv:
-                xz.append([dicti[k][i][0], dicti[k][i][2], dicti[k][i][4], dicti[k][i][5]])
+                xz.append([dicti[k][i][0], dicti[k][i][2], dicti[k][i][3], dicti[k][i][5]])
             if dicti[k][i][0] == xpv:
                 yz.append([dicti[k][i][1], dicti[k][i][2], dicti[k][i][4], dicti[k][i][5]])
 
@@ -380,27 +388,33 @@ def alt_plane_plots(xpv, ypv, dicti):
     axv = mean_vel(xzxv, xzz)
     ayv = mean_vel(yzyv, yzz)
 
+    dfdd = np.array(abs(exp_h_list) - np.amin(abs(exp_h_list)))
+    xzz = np.array(abs(np.array(xzz)) - np.amin(abs(np.array(xzz))))
+    yzz = np.array(abs(np.array(yzz)) - np.amin(abs(np.array(yzz))))
+
     f, axarr = plt.subplots(2,2, sharey=True)
 
-    fig = axarr[0,0].quiver(xzx, xzz, xzxv, xzzv, xzxv)
+    fig = axarr[0,0].quiver(xzx, xzz, xzxv, xzzv, yzyv)
     axarr[0,0].set_xlabel("x")
-    axarr[0,0].set_ylabel("z", rotation=0)
+    axarr[0,0].set_ylabel(r"Height from dd ($mm$)")
     # axarr[0,0].set_title("x-z plane, x-velocity")
-    f.colorbar(fig, ax=axarr[0,0]) # colorbar is set using xzxv and references both plots
+    # f.colorbar(fig, ax=axarr[0,0]) # colorbar is set using xzxv and references both plots
 
-    axarr[0,1].plot(axv, exp_h_list, 'ko-')
+    axarr[0,1].plot(axv, dfdd, 'go-')
+    axarr[0,1].plot([0.0, 0.0], [np.amin(dfdd), np.amax(dfdd)], 'k--')
     axarr[0,1].set_xlabel(r"x-velocity ($ms^{-1}$)")
 
 
-    fig2 = axarr[1,0].quiver(yzy, yzz, yzyv, yzzv, yzyv)
+    axarr[1,0].quiver(yzy, yzz, yzyv, yzzv, yzyv)
     axarr[1,0].set_xlabel("y")
-    axarr[1,0].set_ylabel("z", rotation=0)
-    f.colorbar(fig2, ax=axarr[1,0])
-    # axarr[1,0].set_title("y-z plane, y-velocity")
+    axarr[1,0].set_ylabel(r"Height from dd ($mm$)")
 
-    axarr[1,1].plot(ayv, exp_h_list, 'ko-')
+    axarr[1,1].plot(ayv, dfdd, 'bo-')
+    axarr[1,1].plot([0.0, 0.0], [np.amin(dfdd), np.amax(dfdd)], 'k--')
     axarr[1,1].set_xlabel(r"y-velocity ($ms^{-1}$)")
 
+    cax, kw = mpl.colorbar.make_axes([ax for ax in axarr.flat])
+    f.colorbar(fig, cax=cax, **kw)
     plt.show()
 
 
@@ -484,8 +498,8 @@ if __name__ == '__main__':
                     pa = dict_to_array(h_pos_vel_dict)
                     plot_3d_vector(pa)
 
-                plots_2d(h_pos_vel_dict)
-                alt_plane_plots(midx, midy, h_pos_vel_dict)
+                # plots_2d(h_pos_vel_dict)
+                plane_plots(midx, midy, h_pos_vel_dict)
             else:
                 print "\nError: height list does not match number of subdirectories containing files!"
         else:

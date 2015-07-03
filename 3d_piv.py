@@ -362,10 +362,34 @@ def plot_2d_mean_roi(mxa, mya, errx, erry):
     plt.show()
 
 
-def xzplane_plot(xpv, dicti):
+def xzplane_plot(ypv, dicti):
     """
 
-    :param opv: X plane value.
+    :param ypv: y-value where we take the xz-plane.
+    :param dicti: Dictionary; for each height there is a corresponding array of
+                    [x_position, y_pos, z_pos x_velocity, y_vel, z_vel]
+    :return: n/a
+    """
+    za = []
+
+    for k in dicti:
+        for i in range(len(dicti[k])):
+            if dicti[k][i][1] == ypv:
+                za.append([dicti[k][i][0], dicti[k][i][2], dicti[k][i][4], dicti[k][i][5]])
+
+    X, Z, U, V = zip(*za)
+    fig = plt.quiver(X, Z, U, V, U)
+    plt.colorbar(fig)
+    plt.title("X-Z plane")
+    plt.xlabel("X")
+    plt.ylabel("Z")
+    plt.show()
+
+
+def yzplane_plot(xpv, dicti):
+    """
+
+    :param xpv: x-value where we take the yz-plane.
     :param dicti: Dictionary; for each height there is a corresponding array of
                     [x_position, y_pos, z_pos x_velocity, y_vel, z_vel]
     :return: n/a
@@ -377,13 +401,13 @@ def xzplane_plot(xpv, dicti):
             if dicti[k][i][0] == xpv:
                 za.append([dicti[k][i][1], dicti[k][i][2], dicti[k][i][4], dicti[k][i][5]])
 
-    X, Z, U, V = zip(*za)
-    fig = plt.quiver(X, Z, U, V, U)
+    Y, Z, U, V = zip(*za)
+    fig = plt.quiver(Y, Z, U, V, U)
     plt.colorbar(fig)
-    plt.title("X-Z plane")
-    plt.ylabel("Height")
+    plt.title("Y-Z plane")
+    plt.xlabel("Y")
+    plt.ylabel("Z")
     plt.show()
-
 
 
 if __name__ == '__main__':
@@ -410,8 +434,8 @@ if __name__ == '__main__':
     sd_bar = False  # plot standard deviation bars on 2d_mean_roi graph
     # If both true, sem will be plotted
 
-    xz_value = 0
-    yz_value = 0
+    midx = 0
+    midy = 0
 
     if sem_bar or sd_bar:
         if lehl != 0:
@@ -439,7 +463,7 @@ if __name__ == '__main__':
                     else:
                         fhc = str(hcount)
 
-                    xz_value, yz_value, h_pos_vel_dict["height{0}".format(fhc)] = get_data(
+                    midx, midy, h_pos_vel_dict["height{0}".format(fhc)] = get_data(
                         exp_h_list[
                                                                                       hcount],
                                                                        height_file_dict[k])
@@ -451,7 +475,8 @@ if __name__ == '__main__':
                     plot_3d_vector(pa)
 
                 plots_2d(h_pos_vel_dict)
-                xzplane_plot(xz_value, h_pos_vel_dict)
+                xzplane_plot(midy, h_pos_vel_dict)
+                yzplane_plot(midx, h_pos_vel_dict)
             else:
                 print "\nError: height list does not match number of subdirectories containing files!"
         else:

@@ -362,54 +362,6 @@ def plot_2d_mean_roi(mxa, mya, errx, erry):
     plt.show()
 
 
-def xzplane_plot(ypv, dicti):
-    """
-
-    :param ypv: y-value where we take the xz-plane.
-    :param dicti: Dictionary; for each height there is a corresponding array of
-                    [x_position, y_pos, z_pos x_velocity, y_vel, z_vel]
-    :return: n/a
-    """
-    za = []
-
-    for k in dicti:
-        for i in range(len(dicti[k])):
-            if dicti[k][i][1] == ypv:
-                za.append([dicti[k][i][0], dicti[k][i][2], dicti[k][i][4], dicti[k][i][5]])
-
-    X, Z, U, V = zip(*za)
-    fig = plt.quiver(X, Z, U, V, U)
-    plt.colorbar(fig)
-    plt.title("X-Z plane")
-    plt.xlabel("X")
-    plt.ylabel("Z", rotation = 0)
-    plt.show()
-
-
-def yzplane_plot(xpv, dicti):
-    """
-
-    :param xpv: x-value where we take the yz-plane.
-    :param dicti: Dictionary; for each height there is a corresponding array of
-                    [x_position, y_pos, z_pos x_velocity, y_vel, z_vel]
-    :return: n/a
-    """
-    za = []
-
-    for k in dicti:
-        for i in range(len(dicti[k])):
-            if dicti[k][i][0] == xpv:
-                za.append([dicti[k][i][1], dicti[k][i][2], dicti[k][i][4], dicti[k][i][5]])
-
-    Y, Z, U, V = zip(*za)
-    fig = plt.quiver(Y, Z, U, V, U)
-    plt.colorbar(fig)
-    plt.title("Y-Z plane")
-    plt.xlabel("Y")
-    plt.ylabel("Z", rotation=0)
-    plt.show()
-
-
 def alt_plane_plots(xpv, ypv, dicti):
 
     xz = []
@@ -425,18 +377,48 @@ def alt_plane_plots(xpv, ypv, dicti):
     xzx, xzz, xzxv, xzzv = zip(*xz)
     yzy, yzz, yzyv, yzzv = zip(*yz)
 
-    f, axarr = plt.subplots(1, 2, sharey = True)
+    axv = mean_vel(xzxv, xzz)
+    ayv = mean_vel(yzyv, yzz)
 
-    fig = axarr[0].quiver(xzx, xzz, xzxv, xzzv, yzyv)
-    f.colorbar(fig) # colorbar is set using yzyv and references both plots
-    axarr[1].quiver(yzy, yzz, yzyv, yzzv, yzyv)
+    f, axarr = plt.subplots(2,2, sharey=True)
 
-    axarr[0].set_xlabel("x")
-    axarr[0].set_ylabel("z", rotation=0)
-    axarr[0].set_title("x-z plane, x-velocity")
-    axarr[1].set_xlabel("y")
-    axarr[1].set_title("y-z plane, y-velocity")
+    fig = axarr[0,0].quiver(xzx, xzz, xzxv, xzzv, xzxv)
+    axarr[0,0].set_xlabel("x")
+    axarr[0,0].set_ylabel("z", rotation=0)
+    # axarr[0,0].set_title("x-z plane, x-velocity")
+    f.colorbar(fig, ax=axarr[0,0]) # colorbar is set using xzxv and references both plots
+
+    axarr[0,1].plot(axv, exp_h_list, 'ko-')
+    axarr[0,1].set_xlabel(r"x-velocity ($ms^{-1}$)")
+
+
+    fig2 = axarr[1,0].quiver(yzy, yzz, yzyv, yzzv, yzyv)
+    axarr[1,0].set_xlabel("y")
+    axarr[1,0].set_ylabel("z", rotation=0)
+    f.colorbar(fig2, ax=axarr[1,0])
+    # axarr[1,0].set_title("y-z plane, y-velocity")
+
+    axarr[1,1].plot(ayv, exp_h_list, 'ko-')
+    axarr[1,1].set_xlabel(r"y-velocity ($ms^{-1}$)")
+
     plt.show()
+
+
+def mean_vel(vel_array, z_array):
+
+    ava = []
+
+    for i in range(len(exp_h_list)):
+        va = []
+        for j in range(len(z_array)):
+            if z_array[j] == exp_h_list[i]:
+                va.append(vel_array[j])
+
+        ava.append(np.mean(va))
+
+    return np.array(ava)
+
+
 
 if __name__ == '__main__':
 
@@ -503,8 +485,6 @@ if __name__ == '__main__':
                     plot_3d_vector(pa)
 
                 plots_2d(h_pos_vel_dict)
-                # xzplane_plot(midy, h_pos_vel_dict)
-                # yzplane_plot(midx, h_pos_vel_dict)
                 alt_plane_plots(midx, midy, h_pos_vel_dict)
             else:
                 print "\nError: height list does not match number of subdirectories containing files!"

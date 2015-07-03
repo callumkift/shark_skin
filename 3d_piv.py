@@ -88,6 +88,7 @@ def get_data(eh, file_list):
     x_vel = []
     y_vel = []
     z_vel = []
+    unique_x = []
     unique_y = []
 
     # reading data
@@ -107,6 +108,8 @@ def get_data(eh, file_list):
                         y_vel.append(float(column[3]))
                         z_vel.append(0.0)
 
+                        if float(column[0]) not in unique_y:
+                            unique_x.append(float(column[0]))
                         if float(column[1]) not in unique_y:
                             unique_y.append(float(column[1]))
                     else:
@@ -120,6 +123,8 @@ def get_data(eh, file_list):
         print "All data read."
 
     uy = len(unique_y)
+    xmid = np.median(unique_x)
+    ymid = np.median(unique_y)
 
     # checks list lengths to ensure matching and then averages the velocities for all files
     # and then returns an array with position and average velocities
@@ -135,7 +140,7 @@ def get_data(eh, file_list):
                 return subgrid_array
             else:
                 z_pos = [eh] * len(x_pos)
-                return zip(x_pos, y_pos, z_pos, ax_vel, ay_vel, az_vel)
+                return xmid, ymid, zip(x_pos, y_pos, z_pos, ax_vel, ay_vel, az_vel)
         else:
             print "Error: different number of velocities!"
     else:
@@ -353,8 +358,32 @@ def plot_2d_mean_roi(mxa, mya, errx, erry):
         plt.xlabel(r"Velocity ($ms^{-1}$), $\pm$sd")
 
     plt.ylabel("Height from dermal dentical")
-    plt.title("Averaged velocity over roi")
+    plt.title("Averaged velocity, %s, %s" %(shark_species, sample_area))
     plt.show()
+
+
+def xzplane_plot(xpv, dicti):
+    """
+
+    :param opv: X plane value.
+    :param dicti: Dictionary; for each height there is a corresponding array of
+                    [x_position, y_pos, z_pos x_velocity, y_vel, z_vel]
+    :return: n/a
+    """
+    za = []
+
+    for k in dicti:
+        for i in range(len(dicti[k])):
+            if dicti[k][i][0] == xpv:
+                za.append([dicti[k][i][1], dicti[k][i][2], dicti[k][i][4], dicti[k][i][5]])
+
+    X, Z, U, V = zip(*za)
+    fig = plt.quiver(X, Z, U, V, U)
+    plt.colorbar(fig)
+    plt.title("X-Z plane")
+    plt.ylabel("Height")
+    plt.show()
+
 
 
 if __name__ == '__main__':
@@ -362,8 +391,8 @@ if __name__ == '__main__':
     main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/20150701_x10_bonnet_back/"
     # main dir where all the subdirs with the data are
 
-    shark_species = ""
-    sample_area = ""
+    shark_species = "Bonnethead"
+    sample_area = "back"
     exp_h_list = read_hf()  # vertical heights of PIV
     lehl = len(exp_h_list)
 
@@ -377,9 +406,12 @@ if __name__ == '__main__':
     peo2 = 3  # plots every nth vector for the 2D plot
 
     # At least one must be True
-    sem_bar = False  # plots standard error on mean bars on 2d_mean_roi graph
-    sd_bar = True  # plot standard deviation bars on 2d_mean_roi graph
+    sem_bar = True  # plots standard error on mean bars on 2d_mean_roi graph
+    sd_bar = False  # plot standard deviation bars on 2d_mean_roi graph
     # If both true, sem will be plotted
+
+    xz_value = 0
+    yz_value = 0
 
     if sem_bar or sd_bar:
         if lehl != 0:
@@ -407,7 +439,9 @@ if __name__ == '__main__':
                     else:
                         fhc = str(hcount)
 
-                    h_pos_vel_dict["height{0}".format(fhc)] = get_data(exp_h_list[hcount],
+                    xz_value, yz_value, h_pos_vel_dict["height{0}".format(fhc)] = get_data(
+                        exp_h_list[
+                                                                                      hcount],
                                                                        height_file_dict[k])
                     hcount += 1
                 h_pos_vel_dict = collections.OrderedDict(sorted(h_pos_vel_dict.items()))
@@ -417,7 +451,7 @@ if __name__ == '__main__':
                     plot_3d_vector(pa)
 
                 plots_2d(h_pos_vel_dict)
-
+                xzplane_plot(xz_value, h_pos_vel_dict)
             else:
                 print "\nError: height list does not match number of subdirectories containing files!"
         else:

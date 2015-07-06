@@ -123,7 +123,7 @@ def get_data(eh, file_list):
     if eh == exp_h_list[-1]:
         print "All data read."
 
-    uy = len(unique_y)
+    ux = len(unique_x)
     xmid = np.median(unique_x)
     ymid = np.median(unique_y)
 
@@ -137,7 +137,7 @@ def get_data(eh, file_list):
             ax_vel, ay_vel, az_vel = avg_data_each_h(nof, pos_count, x_vel, y_vel, z_vel)
 
             if make_sg:
-                subgrid_array = sub_grid(uy, x_pos, y_pos, eh, ax_vel, ay_vel, az_vel)
+                subgrid_array = sub_grid(ux, x_pos, y_pos, eh, ax_vel, ay_vel, az_vel)
                 return subgrid_array
             else:
                 z_pos = [eh] * len(x_pos)
@@ -189,10 +189,10 @@ def avg_data_each_h(nof, lof, x_vel, y_vel, z_vel):
         print "Error: summed velocity data not matching!"
 
 
-def sub_grid(unique_y, xpos, ypos, zpos, axvel, ayvel, azvel):
+def sub_grid(unique_x, xpos, ypos, zpos, axvel, ayvel, azvel):
     """
     Creates an n*n subgrid
-    :param unique_y: Number of unique y positions
+    :param unique_x: Number of unique x positions
     :param xpos: Array of x_positions
     :param ypos: Array of y_positions
     :param zpos: Array of z_positions
@@ -206,7 +206,7 @@ def sub_grid(unique_y, xpos, ypos, zpos, axvel, ayvel, azvel):
     ssgh_array = []
 
     i = 0
-    while i + n + ((n - 1) * unique_y) < len(xpos):
+    while i + n + ((n - 1) * unique_x) < len(xpos):
         # Makes sure that subgrid can be fromed
         sxp = 0
         syp = 0
@@ -217,19 +217,19 @@ def sub_grid(unique_y, xpos, ypos, zpos, axvel, ayvel, azvel):
 
         for j in range(n):
             for k in range(n):
-                sxp += xpos[i + j + (k * unique_y)]
-                syp += ypos[i + j + (k * unique_y)]
+                sxp += xpos[i + j + (k * unique_x)]
+                syp += ypos[i + j + (k * unique_x)]
                 szp += zpos
-                sxv += axvel[i + j + (k * unique_y)]
-                syv += ayvel[i + j + (k * unique_y)]
-                szv += azvel[i + j + (k * unique_y)]
+                sxv += axvel[i + j + (k * unique_x)]
+                syv += ayvel[i + j + (k * unique_x)]
+                szv += azvel[i + j + (k * unique_x)]
         ssgh_array.append([sxp, syp, szp, sxv, syv, szv])
 
         if (i + n) < len(xpos):
             i += n
         else:
-            pl = unique_y - (i % unique_y)
-            i += pl + ((n - 1) * unique_y)
+            pl = unique_x - (i % unique_x)
+            i += pl + ((n - 1) * unique_x)
 
     return np.array(ssgh_array) / sqr(n)
 
@@ -336,6 +336,7 @@ def plane_plots(xpv, ypv, dicti):
     axv, exv= mean_vel(xzxv, xzz)
     ayv, eyv = mean_vel(yzyv, yzz)
 
+    # Changes height values to distance from dermal denticles.
     dfdd = np.array(abs(exp_h_list) - np.amin(abs(exp_h_list)))
     xzz = np.array(abs(np.array(xzz)) - np.amin(abs(np.array(xzz))))
     yzz = np.array(abs(np.array(yzz)) - np.amin(abs(np.array(yzz))))
@@ -362,7 +363,8 @@ def plane_plots(xpv, ypv, dicti):
 
     cax, kw = mpl.colorbar.make_axes([ax for ax in axarr.flat])
     f.colorbar(fig, cax=cax, **kw)
-    f.suptitle(r"$\mu$-PIV for the %s (%s)" %(shark_species, sample_area))
+    f.suptitle(r"$\mu$-PIV for the %s (%s). Flow direction: %s" %(shark_species, sample_area,
+                                                                  flow_direction))
     plt.show()
 
 
@@ -389,11 +391,12 @@ def mean_vel(vel_array, z_array):
 
 if __name__ == '__main__':
 
-    main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/20150701_x10_bonnet_back/"
+    main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/te_x10_bonnet_c1/"
     # main dir where all the subdirs with the data are
 
-    shark_species = "Bonnethead"
-    sample_area = "back"
+    shark_species = ""
+    sample_area = ""
+    flow_direction = ""
     exp_h_list = read_hf()  # vertical heights of PIV
     lehl = len(exp_h_list)
 

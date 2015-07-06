@@ -363,6 +363,9 @@ def plane_plots(xpv, ypv, dicti):
 
     cax, kw = mpl.colorbar.make_axes([ax for ax in axarr.flat])
     f.colorbar(fig, cax=cax, **kw)
+    cbar = mpl.colorbar.ColorbarBase(cax, norm=mpl.colors.Normalize(vmin=-0.1, vmax=0.1))
+    cbar.set_clim(-0.1,0.1)
+    # f.set_clim(-0.1, 0.1)
     f.suptitle(r"$\mu$-PIV for the %s (%s). Flow direction: %s" %(shark_species, sample_area,
                                                                   flow_direction))
     plt.show()
@@ -391,7 +394,7 @@ def mean_vel(vel_array, z_array):
 
 if __name__ == '__main__':
 
-    main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/te_x10_bonnet_c1/"
+    main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/20150701_x10_bonnet_back/"
     # main dir where all the subdirs with the data are
 
     shark_species = ""

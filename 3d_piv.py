@@ -348,24 +348,22 @@ def plane_plots(xpv, ypv, dicti):
     axarr[0,0].set_xlabel("x")
     axarr[0,0].set_ylabel(r"Height from dd ($mm$)")
 
-    axarr[0,1].errorbar(axv, dfdd, xerr=exv, marker='o', color='g')
+    axarr[0,1].errorbar(100*axv, dfdd, xerr=100*exv, marker='o', color='g')
     axarr[0,1].plot([0.0, 0.0], [np.amin(dfdd), np.amax(dfdd)], 'k--')
-    axarr[0,1].set_xlabel(r"x-velocity ($ms^{-1}$)")
-
+    axarr[0,1].set_xlabel(r"x-velocity ($\times 10^{-2}ms^{-1}$)")
 
     axarr[1,0].quiver(yzy, yzz, yzyv, yzzv, yzyv)
     axarr[1,0].set_xlabel("y")
     axarr[1,0].set_ylabel(r"Height from dd ($mm$)")
 
-    axarr[1,1].errorbar(ayv, dfdd, xerr=eyv, marker='o', color='b')
+    axarr[1,1].errorbar(100*ayv, dfdd, xerr=100*eyv, marker='o', color='b')
     axarr[1,1].plot([0.0, 0.0], [np.amin(dfdd), np.amax(dfdd)], 'k--')
-    axarr[1,1].set_xlabel(r"y-velocity ($ms^{-1}$)")
+    axarr[1,1].set_xlabel(r"y-velocity ($\times 10^{-2}ms^{-1}$)")
 
     cax, kw = mpl.colorbar.make_axes([ax for ax in axarr.flat])
     f.colorbar(fig, cax=cax, **kw)
     cbar = mpl.colorbar.ColorbarBase(cax, norm=mpl.colors.Normalize(vmin=-0.1, vmax=0.1))
     cbar.set_clim(-0.1,0.1)
-    # f.set_clim(-0.1, 0.1)
     f.suptitle(r"$\mu$-PIV for the %s (%s). Flow direction: %s" %(shark_species, sample_area,
                                                                   flow_direction))
     plt.show()
@@ -394,12 +392,12 @@ def mean_vel(vel_array, z_array):
 
 if __name__ == '__main__':
 
-    main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/20150701_x10_bonnet_back/"
+    main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/20150709_x10_bonnet_c1_s1/"
     # main dir where all the subdirs with the data are
 
-    shark_species = ""
-    sample_area = ""
-    flow_direction = ""
+    shark_species = "Bonnethead"
+    sample_area = "C1, Side 1"
+    flow_direction = "-ve y."
     exp_h_list = read_hf()  # vertical heights of PIV
     lehl = len(exp_h_list)
 

@@ -55,7 +55,7 @@ def get_data(v_file):
     return [height_values, xveloc_values, yveloc_values]
 
 
-def plot_velocities(dict):
+def plot_xy():
 
 
     f, axarr = plt.subplots(2, sharex=True)
@@ -63,8 +63,8 @@ def plot_velocities(dict):
         xv = 100*np.array(items[1])
         yv = 100*np.array(items[2])
         h = items[0]
-        axarr[0].plot(xv, h, "o-", label=str(key))
-        axarr[1].plot(yv, h, "o-")
+        axarr[0].plot(xv, h, "*-", label=str(key))
+        axarr[1].plot(yv, h, "*-")
 
     axarr[0].set_xlabel(r"x-velocity ($\times 10^{-2}ms^{-1}$)")
     axarr[0].set_ylabel(r"Height from dd ($mm$)")
@@ -79,11 +79,27 @@ def plot_velocities(dict):
     return
 
 
+def plot_flow():
+
+    for key, items in velocity_dict.iteritems():
+        plt.plot(100*np.array(items[2]), items[0]/np.amax(items[0]), "*-", label = str(key))
+
+    plt.xlabel(r"Flow-velocity ($\times 10^{-2}ms^{-1}$)")
+    plt.ylabel(r"Height from dd ($mm$)")
+    plt.title("Average velocity in direction of flow. Normalised height.")
+    plt.legend(loc=2)
+    plt.show()
+    return
+
+
 
 if __name__ == '__main__':
 
     main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/mean_vels/"
 
+    # Choose which plots to show
+    plotXY = False # Plots both x- and y-velocities in subplots
+    plotFLOW = True # Plots y-velocities (normally flow direction)
 
     if not os.path.exists(main_dir):
         print "Error: main directory does not exist!"
@@ -98,4 +114,8 @@ if __name__ == '__main__':
             velocity_dict["{}".format(file.rsplit("/", 1)[1][:-4])] = get_data(file)
 
         velocity_dict = collections.OrderedDict(sorted(velocity_dict.items()))
-        plot_velocities(velocity_dict)
+
+        if plotXY:
+            plot_xy()
+        if plotFLOW:
+            plot_flow()

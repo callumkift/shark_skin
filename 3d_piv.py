@@ -276,6 +276,7 @@ def plot_3d_vector(pa):
     ax.set_title(r"$\mu$-PIV vector plot, %s, %s" % (shark_species, sample_area))
 
     plt.show()
+    return
 
 
 def plot_2d_vector(dicti):
@@ -309,7 +310,7 @@ def plot_2d_vector(dicti):
         plt.show()
 
         hcount += 1
-
+    return
 
 def plane_plots(xpv, ypv, dicti):
     """
@@ -368,6 +369,10 @@ def plane_plots(xpv, ypv, dicti):
                                                                   flow_direction))
     plt.show()
 
+    if w2f:
+        write_mean_to_file(dfdd, axv, ayv)
+
+    return
 
 def mean_vel(vel_array, z_array):
 
@@ -389,13 +394,45 @@ def mean_vel(vel_array, z_array):
         return np.array(ava), np.array(eva)
 
 
+def write_mean_to_file(height, x_vel, y_vel):
+    """
+    Writes the average velocities for each height to a file
+    :param height: list of experimental heights
+    :param x_vel: list of average x-velocities
+    :param y_vel: list of average y_velocities
+    :return: n/a
+    """
+
+    mean_dir = path2dir + "mean_vels/"
+    mean_file = mean_dir + exp_dir + ".txt"
+
+    if not os.path.exists(mean_dir):
+        os.makedirs(mean_dir)
+        print "Creating mean_vels directory. It is a subfolder of \n %s" %path2dir
+
+    if os.path.exists(mean_file):
+        print "\nN.B. Mean velocity file for this data already exists. File not written."
+    else:
+        f = open(mean_file, "w")
+        for i in range(len(height)):
+            if i == 0:
+                f.write("height\tx-velocity\ty_velocity\n")
+
+            if i == len(height):
+                f.write("%s\t%s\t%s" %(height[i], x_vel[i], y_vel[i]))
+            else:
+                f.write("%s\t%s\t%s\n" %(height[i], x_vel[i], y_vel[i]))
+        f.close()
+        print "\nAverage values written to file."
+
+    return
+
 
 if __name__ == '__main__':
 
     path2dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/"
-    dir_name = "20150710_x10_empty"
-
-    main_dir = path2dir + dir_name + "/"
+    exp_dir = "20150713_x10_greenland_back"
+    main_dir = path2dir + exp_dir + "/"
 
     # main dir where all the subdirs with the data are
 
@@ -419,6 +456,11 @@ if __name__ == '__main__':
     sd_bar = False  # plot standard deviation bars on 2d_mean_roi graph
     # If both true, sem will be plotted
 
+    w2f = True # If true, will write the mean velocities for each height to a new file
+    # This file will be in a directory in path2dir and be called mean_vels. The files name
+    # will match that of exp_dir.
+
+    # Median x/y values for our data. Revalued below.
     midx = 0
     midy = 0
 

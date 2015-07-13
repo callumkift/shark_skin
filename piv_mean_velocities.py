@@ -34,6 +34,9 @@ def get_files(a_dir):
 
 
 def get_data(v_file):
+    """
+    Retrieves data from the file sent. Returns an array containing heights and averaged velocities.
+    """
 
     height_values = []
     xveloc_values = []
@@ -56,7 +59,9 @@ def get_data(v_file):
 
 
 def plot_xy():
-
+    """
+    Plots 2 graphs, showing the averaged x-/y-velocities for each sample.
+    """
 
     f, axarr = plt.subplots(2, sharex=True)
     for key, items in velocity_dict.iteritems():
@@ -80,9 +85,11 @@ def plot_xy():
 
 
 def plot_flow():
-
+    """
+    Plots the average y-velocity for each sample.
+    """
     for key, items in velocity_dict.iteritems():
-        plt.plot(100*np.array(items[2]), items[0]/np.amax(items[0]), "*-", label = str(key))
+        plt.plot(-100*np.array(items[2]), items[0]/np.amax(items[0]), "*-", label = str(key))
 
     plt.xlabel(r"Flow-velocity ($\times 10^{-2}ms^{-1}$)")
     plt.ylabel(r"Height from dd ($mm$)")
@@ -112,8 +119,10 @@ if __name__ == '__main__':
 
         for file in velocity_files:
             velocity_dict["{}".format(file.rsplit("/", 1)[1][:-4])] = get_data(file)
+            # makes the key = filename without .txt, item = array of positions and velocities.
 
         velocity_dict = collections.OrderedDict(sorted(velocity_dict.items()))
+        # Sorts the dictionary
 
         if plotXY:
             plot_xy()

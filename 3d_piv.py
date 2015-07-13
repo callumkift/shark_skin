@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+0#!/usr/bin/env python
 
 ###
 #
@@ -392,11 +392,15 @@ def mean_vel(vel_array, z_array):
 
 if __name__ == '__main__':
 
-    main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/20150709_x10_bonnet_c1_s1/"
+    path2dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/"
+    dir_name = "20150710_x10_empty"
+
+    main_dir = path2dir + dir_name + "/"
+
     # main dir where all the subdirs with the data are
 
-    shark_species = "Bonnethead"
-    sample_area = "C1, Side 1"
+    shark_species = ""
+    sample_area = ""
     flow_direction = "-ve y."
     exp_h_list = read_hf()  # vertical heights of PIV
     lehl = len(exp_h_list)
@@ -461,6 +465,7 @@ if __name__ == '__main__':
                     plot_2d_vector(h_pos_vel_dict)
             else:
                 print "\nError: height list does not match number of subdirectories containing files!"
+                print "Subdirectories: %d, Height list: %d" %(len(sub_dirs), lehl)
         else:
             print "\nError: experimental height measurements not given!"
     else:

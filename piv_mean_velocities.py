@@ -58,13 +58,23 @@ def get_data(v_file):
 def plot_velocities(dict):
 
 
+    f, axarr = plt.subplots(2, sharex=True)
     for key, items in velocity_dict.iteritems():
-        plt.plot(100*np.array(items[1]), items[0], label=str(key))
+        xv = 100*np.array(items[1])
+        yv = 100*np.array(items[2])
+        h = items[0]
+        axarr[0].plot(xv, h, "o-", label=str(key))
+        axarr[1].plot(yv, h, "o-")
 
-    plt.xlabel(r"Velocity ($\times 10^{-2}ms^{-1}$)")
-    plt.ylabel(r"Height from dd ($mm$)")
-    plt.title("Averaged velocities")
-    plt.legend()
+    axarr[0].set_xlabel(r"x-velocity ($\times 10^{-2}ms^{-1}$)")
+    axarr[0].set_ylabel(r"Height from dd ($mm$)")
+
+    axarr[1].set_xlabel(r"y-velocity ($\times 10^{-2}ms^{-1}$)")
+    axarr[1].set_ylabel(r"Height from dd ($mm$)")
+
+
+    f.suptitle("Averaged velocities")
+    axarr[0].legend(loc="upper left", borderaxespad=0.0)
     plt.show()
     return
 
@@ -73,6 +83,7 @@ def plot_velocities(dict):
 if __name__ == '__main__':
 
     main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/mean_vels/"
+
 
     if not os.path.exists(main_dir):
         print "Error: main directory does not exist!"

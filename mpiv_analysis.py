@@ -1,10 +1,11 @@
-0#!/usr/bin/env python
+#!/usr/bin/env python
 
 ###
 #
-# This script creates a 3D vector map using data from
-# the micro-PIV experiments. It averages over each height
-# and combines this into a single graph.
+# This script creates a 3D vector map, 2D vector maps for each height
+# using data from the micro-PIV experiments. It averages over each height
+# and combines this into a single graph. It can also write the averaged
+# velocities to a new file.
 #
 # Author: Callum Kift
 #
@@ -431,7 +432,7 @@ def write_mean_to_file(height, x_vel, y_vel):
 if __name__ == '__main__':
 
     path2dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/"
-    exp_dir = "20150713_x10_greenland_back"
+    exp_dir = "20150709_x10_bonnet_back"
     main_dir = path2dir + exp_dir + "/"
 
     # main dir where all the subdirs with the data are

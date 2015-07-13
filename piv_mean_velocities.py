@@ -55,6 +55,21 @@ def get_data(v_file):
     return [height_values, xveloc_values, yveloc_values]
 
 
+def plot_velocities(dict):
+
+
+    for key, items in velocity_dict.iteritems():
+        plt.plot(100*np.array(items[1]), items[0], label=str(key))
+
+    plt.xlabel(r"Velocity ($\times 10^{-2}ms^{-1}$)")
+    plt.ylabel(r"Height from dd ($mm$)")
+    plt.title("Averaged velocities")
+    plt.legend()
+    plt.show()
+    return
+
+
+
 if __name__ == '__main__':
 
     main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/mean_vels/"
@@ -71,5 +86,5 @@ if __name__ == '__main__':
         for file in velocity_files:
             velocity_dict["{}".format(file.rsplit("/", 1)[1][:-4])] = get_data(file)
 
-
-
+        velocity_dict = collections.OrderedDict(sorted(velocity_dict.items()))
+        plot_velocities(velocity_dict)

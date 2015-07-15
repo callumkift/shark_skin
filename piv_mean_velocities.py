@@ -89,12 +89,13 @@ def plot_flow():
     Plots the average y-velocity for each sample.
     """
     for key, items in velocity_dict.iteritems():
-        plt.plot(-100*np.array(items[2]), items[0]/np.amax(items[0]), "*-", label = str(key))
+        plt.plot(-100*np.array(items[2]), items[0]/np.amax(items[0]), "o-", label = str(key))
 
+    plt.plot((0,10), (0.5,0.5), 'k--')
     plt.xlabel(r"Flow-velocity ($\times 10^{-2}ms^{-1}$)")
-    plt.ylabel(r"Height from dd ($mm$)")
+    plt.ylabel(r"Height from dd")
     plt.title("Average velocity in direction of flow. Normalised height.")
-    plt.legend(loc=2)
+    plt.legend(loc=1)
     plt.show()
     return
 

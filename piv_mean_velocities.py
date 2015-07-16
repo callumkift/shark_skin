@@ -15,6 +15,7 @@ import os
 import collections
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
 
 
 def get_files(a_dir):
@@ -83,19 +84,29 @@ def plot_xy():
     plt.show()
     return
 
-
+import string
 def plot_flow():
     """
     Plots the average y-velocity for each sample.
     """
+    width_shrink = 0.85
+    ax = plt.subplot(111)
     for key, items in velocity_dict.iteritems():
-        plt.plot(-100*np.array(items[2]), items[0]/np.amax(items[0]), "o-", label = str(key))
+        ax.plot(-100*np.array(items[2]), items[0]/np.amax(items[0]), "o-", label =
+        string.replace(key[4:], "_x10", ""))
 
-    plt.plot((0,10), (0.5,0.5), 'k--')
-    plt.xlabel(r"Flow-velocity ($\times 10^{-2}ms^{-1}$)")
-    plt.ylabel(r"Height from dd")
-    plt.title("Average velocity in direction of flow. Normalised height.")
-    plt.legend(loc=1)
+    ax.plot((0,10), (0.5,0.5), 'k--')
+    ax.set_xlabel(r"Flow-velocity ($\times 10^{-2}ms^{-1}$)")
+    ax.set_ylabel(r"Height from dd")
+    plt.suptitle("Average velocity in direction of flow. Normalised height.")
+
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width*width_shrink, box.height])
+
+    fontP = FontProperties()
+    fontP.set_size('small')
+    leg_pos = (1.15,0.5)
+    ax.legend(prop=fontP, loc=9, bbox_to_anchor=leg_pos)
     plt.show()
     return
 

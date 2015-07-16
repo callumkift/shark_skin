@@ -121,18 +121,27 @@ def get_data(eh, file_list):
                 else:
                     print "Error: TXT file is not correct!"
 
-    # for i in range(len(x_pos)):
-
-
     ux = len(unique_x)
-    xmid = np.median(unique_x)
-    ymid = np.median(unique_y)
+    uy = len(unique_y)
+
+
+    # xmid and ymid are used to get xz- and yz-planes. The median value is used. If the number of
+    # unique xs and ys is even, then the median value will be one that does not correspond to a
+    # measurement. When this is the case, the first value is ignored so that the number of uniques is
+    # odd, resulting in a median value that corresponds to a measurement.
+    if ux % 2 == 0:
+        xmid = np.median(unique_x[1:])
+    else:
+        xmid = np.median(unique_x)
+
+    if uy % 2 == 0:
+        ymid = np.median(unique_y[1:])
+    else:
+        ymid = np.median(unique_y)
 
     if eh == exp_h_list[-1]:
         print "All data read."
-        if xmid not in unique_x:
-            print "\nWarning: Errors will follow! Something wrong with data!"
-            print "Suggestion: Rerun PIV vector calculations.\n"
+
 
     # checks list lengths to ensure matching and then averages the velocities for all files
     # and then returns an array with position and average velocities
@@ -438,7 +447,7 @@ def write_mean_to_file(height, x_vel, y_vel):
 if __name__ == '__main__':
 
     path2dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/"
-    exp_dir = "20150713_x10_greenland_back"
+    exp_dir = "20150716_x10_empty"
     main_dir = path2dir + exp_dir + "/"
 
     # main dir where all the subdirs with the data are

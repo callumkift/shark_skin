@@ -121,12 +121,15 @@ def get_data(eh, file_list):
                 else:
                     print "Error: TXT file is not correct!"
 
+    ux = len(x_pos)
+    xmid = np.median(x_pos)
+    ymid = np.median(y_pos)
+
     if eh == exp_h_list[-1]:
         print "All data read."
-
-    ux = len(unique_x)
-    xmid = np.median(unique_x)
-    ymid = np.median(unique_y)
+        if xmid not in x_pos:
+            print "\nWarning: Errors will follow! Something wrong with data!"
+            print "Suggestion: Rerun PIV vector calculations.\n"
 
     # checks list lengths to ensure matching and then averages the velocities for all files
     # and then returns an array with position and average velocities
@@ -432,12 +435,12 @@ def write_mean_to_file(height, x_vel, y_vel):
 if __name__ == '__main__':
 
     path2dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/"
-    exp_dir = "20150709_x10_bonnet_back"
+    exp_dir = "20150716_x10_empty"
     main_dir = path2dir + exp_dir + "/"
 
     # main dir where all the subdirs with the data are
 
-    shark_species = ""
+    shark_species = "Empty chamber"
     sample_area = ""
     flow_direction = "-ve y."
     exp_h_list = read_hf()  # vertical heights of PIV
@@ -474,9 +477,9 @@ if __name__ == '__main__':
             height_file_dict = {}
             for dir in sub_dirs:
                 height_file_dict["height{0}".format(dir)] = get_files(dir)
+
             height_file_dict = collections.OrderedDict(
                 sorted(height_file_dict.items()))  # sorts dictionary by subdir
-
 
             # Stores an array filled with position and velocities for each height
             if len(height_file_dict) == lehl:
@@ -491,12 +494,10 @@ if __name__ == '__main__':
                     else:
                         fhc = str(hcount)
 
-                    midx, midy, h_pos_vel_dict["height{0}".format(fhc)] = get_data(
-                        exp_h_list[
-                                                                                      hcount],
-                                                                       height_file_dict[k])
+                    midx, midy, h_pos_vel_dict["height{0}".format(fhc)] = get_data(exp_h_list[hcount],height_file_dict[k])
                     hcount += 1
                 h_pos_vel_dict = collections.OrderedDict(sorted(h_pos_vel_dict.items()))
+
 
                 if plot3D:
                     pa = dict_to_array(h_pos_vel_dict)

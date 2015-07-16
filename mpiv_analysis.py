@@ -110,7 +110,7 @@ def get_data(eh, file_list):
                         y_vel.append(float(column[3]))
                         z_vel.append(0.0)
 
-                        if float(column[0]) not in unique_y:
+                        if float(column[0]) not in unique_x:
                             unique_x.append(float(column[0]))
                         if float(column[1]) not in unique_y:
                             unique_y.append(float(column[1]))
@@ -121,13 +121,16 @@ def get_data(eh, file_list):
                 else:
                     print "Error: TXT file is not correct!"
 
-    ux = len(x_pos)
-    xmid = np.median(x_pos)
-    ymid = np.median(y_pos)
+    # for i in range(len(x_pos)):
+
+
+    ux = len(unique_x)
+    xmid = np.median(unique_x)
+    ymid = np.median(unique_y)
 
     if eh == exp_h_list[-1]:
         print "All data read."
-        if xmid not in x_pos:
+        if xmid not in unique_x:
             print "\nWarning: Errors will follow! Something wrong with data!"
             print "Suggestion: Rerun PIV vector calculations.\n"
 
@@ -435,7 +438,7 @@ def write_mean_to_file(height, x_vel, y_vel):
 if __name__ == '__main__':
 
     path2dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/"
-    exp_dir = "20150716_x10_empty"
+    exp_dir = "20150713_x10_greenland_back"
     main_dir = path2dir + exp_dir + "/"
 
     # main dir where all the subdirs with the data are

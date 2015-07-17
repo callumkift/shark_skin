@@ -93,16 +93,20 @@ def plot_flow():
     width_shrink = 0.85
     ax = plt.subplot(111)
     for key, items in velocity_dict.iteritems():
-        ax.plot(-100*np.array(items[2]), items[0]/np.amax(items[0]), "o-", label =
+        ch = 0.5
+        h = np.amax(items[0])
+        vel_factor = h/ch
+
+        ax.plot(-100*vel_factor*np.array(items[2]), items[0]/np.amax(items[0]), "o-", label =
     string.replace(key[4:], "_x10", ""))
-        max_vels.append(np.amax(-100*np.array(items[2])))
+        max_vels.append(np.amax(-100*vel_factor*np.array(items[2])))
 
     max_value = np.amax(max_vels)
 
     ax.plot((0,max_value), (0.5,0.5), 'k--')
     ax.set_xlabel(r"Flow-velocity ($\times 10^{-2}ms^{-1}$)")
-    ax.set_ylabel(r"Height from dd")
-    plt.suptitle("Average velocity in direction of flow. Normalised height.")
+    ax.set_ylabel(r"Normalised height")
+    plt.suptitle("Average velocity in direction of flow. Normalised height, normalised velocity.")
 
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width*width_shrink, box.height])

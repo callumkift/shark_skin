@@ -86,6 +86,9 @@ def plot_xy():
 
 
 def plot_raw():
+    """
+    Plots the raw data of average velocity in flow direction
+    """
     width_shrink = 0.85
     leg_pos = (1.15, 0.5)
     ax = plt.subplot(111)
@@ -109,9 +112,9 @@ def plot_raw():
     return
 
 
-def plot_flow():
+def plot_normalise():
     """
-    Plots the average y-velocity for each sample.
+    Plots the normalised average velocity in the flow direction
     """
     max_vels = []
     width_shrink = 0.85
@@ -120,19 +123,18 @@ def plot_flow():
     ax = plt.subplot(111)
 
     for key, items in velocity_dict.iteritems():
-        ch = 0.5
-        h = np.amax(items[0])
-        vel_factor = h / ch
+        ch = 0.5 # chamber height (optimal)
+        h = np.amax(items[0]) # actual height from experiment
+        norm_factor = h / ch
 
-        ax.plot(-100 * vel_factor * np.array(items[2]), np.array(items[0]) * (0.5 / np.amax(items[
-                                                                                              0])),
+        ax.plot(-100 * norm_factor * np.array(items[2]), np.array(items[0]) / norm_factor,
                 "o-", label=
         string.replace(key[4:], "_x10", ""))
-        max_vels.append(np.amax(-100 * vel_factor * np.array(items[2])))
+        max_vels.append(np.amax(-100 * norm_factor * np.array(items[2])))
 
     max_value = np.amax(max_vels)
 
-    ax.plot((0, max_value), (0.5, 0.5), 'k--')
+    ax.plot((0, max_value), (ch / 2, ch / 2), 'k--')
     ax.set_xlabel(r"Normalised flow-velocity ($\times 10^{-2}ms^{-1}$)")
     ax.set_ylabel(r"Normalised height")
     plt.suptitle("Average velocity in direction of flow. Normalised height, normalised velocity.")
@@ -153,7 +155,7 @@ if __name__ == '__main__':
 
     # Choose which plots to show
     plotXY = False  # Plots both x- and y-velocities in subplots
-    plotFLOW = True  # Plots y-velocities (normally flow direction)
+    plotNORM = True  # Plots normalised flow velocities
 
     if not os.path.exists(main_dir):
         print "Error: main directory does not exist!"
@@ -175,5 +177,5 @@ if __name__ == '__main__':
 
         if plotXY:
             plot_xy()
-        if plotFLOW:
-            plot_flow()
+        if plotNORM:
+            plot_normalise()

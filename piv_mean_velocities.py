@@ -98,7 +98,7 @@ def plot_raw():
         string.replace(key[4:], "_x10", ""))
 
     ax.set_xlabel(r"Flow-velocity ($\times 10^{-2}ms^{-1}$)")
-    ax.set_ylabel(r"Height")
+    ax.set_ylabel(r"Height ($mm$)")
     plt.suptitle("Average velocity in direction of flow. Raw data.")
 
     box = ax.get_position()
@@ -125,12 +125,12 @@ def plot_normalise():
     for key, items in velocity_dict.iteritems():
         ch = 0.5 # chamber height (optimal)
         h = np.amax(items[0]) # actual height from experiment
-        norm_factor = h / ch
+        norm_factor = ch / h
 
-        ax.plot(-100 * norm_factor * np.array(items[2]), np.array(items[0]) / norm_factor,
+        ax.plot(-100 * np.array(items[2]) / norm_factor, np.array(items[0]) * norm_factor,
                 "o-", label=
         string.replace(key[4:], "_x10", ""))
-        max_vels.append(np.amax(-100 * norm_factor * np.array(items[2])))
+        max_vels.append(np.amax(-100 * np.array(items[2]) / norm_factor))
 
     max_value = np.amax(max_vels)
 
@@ -153,7 +153,7 @@ if __name__ == '__main__':
 
     main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/mean_vels/"
 
-    # Choose which plots to show
+    # Choose which plots to show, otherwise just plots raw in y-direction (flow)-direction
     plotXY = False  # Plots both x- and y-velocities in subplots
     plotNORM = True  # Plots normalised flow velocities
 

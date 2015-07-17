@@ -13,6 +13,7 @@
 
 import os
 import collections
+import string
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
@@ -66,8 +67,8 @@ def plot_xy():
 
     f, axarr = plt.subplots(2, sharex=True)
     for key, items in velocity_dict.iteritems():
-        xv = 100*np.array(items[1])
-        yv = 100*np.array(items[2])
+        xv = 100 * np.array(items[1])
+        yv = 100 * np.array(items[2])
         h = items[0]
         axarr[0].plot(xv, h, "*-", label=str(key))
         axarr[1].plot(yv, h, "*-")
@@ -78,46 +79,72 @@ def plot_xy():
     axarr[1].set_xlabel(r"y-velocity ($\times 10^{-2}ms^{-1}$)")
     axarr[1].set_ylabel(r"Height from dd ($mm$)")
 
-
     f.suptitle("Averaged velocities")
     axarr[0].legend(loc="upper left", borderaxespad=0.0)
     plt.show()
     return
 
-import string
+
+def plot_raw():
+    width_shrink = 0.85
+    leg_pos = (1.15, 0.5)
+    ax = plt.subplot(111)
+
+    for key, items in velocity_dict.iteritems():
+        ax.plot(-100 * np.array(items[2]), items[0], "o-", label=
+        string.replace(key[4:], "_x10", ""))
+
+    ax.set_xlabel(r"Flow-velocity ($\times 10^{-2}ms^{-1}$)")
+    ax.set_ylabel(r"Height")
+    plt.suptitle("Average velocity in direction of flow. Raw data.")
+
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * width_shrink, box.height])
+
+    fontP = FontProperties()
+    fontP.set_size('small')
+    ax.legend(prop=fontP, loc=9, bbox_to_anchor=leg_pos)
+    plt.show()
+
+    return
+
+
 def plot_flow():
     """
     Plots the average y-velocity for each sample.
     """
     max_vels = []
     width_shrink = 0.85
+    leg_pos = (1.15, 0.5)
+
     ax = plt.subplot(111)
+
     for key, items in velocity_dict.iteritems():
         ch = 0.5
         h = np.amax(items[0])
-        vel_factor = h/ch
+        vel_factor = h / ch
 
-        ax.plot(-100*vel_factor*np.array(items[2]), items[0]/np.amax(items[0]), "o-", label =
-    string.replace(key[4:], "_x10", ""))
-        max_vels.append(np.amax(-100*vel_factor*np.array(items[2])))
+        ax.plot(-100 * vel_factor * np.array(items[2]), np.array(items[0]) * (0.5 / np.amax(items[
+                                                                                              0])),
+                "o-", label=
+        string.replace(key[4:], "_x10", ""))
+        max_vels.append(np.amax(-100 * vel_factor * np.array(items[2])))
 
     max_value = np.amax(max_vels)
 
-    ax.plot((0,max_value), (0.5,0.5), 'k--')
-    ax.set_xlabel(r"Flow-velocity ($\times 10^{-2}ms^{-1}$)")
+    ax.plot((0, max_value), (0.5, 0.5), 'k--')
+    ax.set_xlabel(r"Normalised flow-velocity ($\times 10^{-2}ms^{-1}$)")
     ax.set_ylabel(r"Normalised height")
     plt.suptitle("Average velocity in direction of flow. Normalised height, normalised velocity.")
 
     box = ax.get_position()
-    ax.set_position([box.x0, box.y0, box.width*width_shrink, box.height])
+    ax.set_position([box.x0, box.y0, box.width * width_shrink, box.height])
 
     fontP = FontProperties()
     fontP.set_size('small')
-    leg_pos = (1.15,0.5)
     ax.legend(prop=fontP, loc=9, bbox_to_anchor=leg_pos)
     plt.show()
     return
-
 
 
 if __name__ == '__main__':
@@ -125,8 +152,8 @@ if __name__ == '__main__':
     main_dir = "/home/callumkift/Documents/sharks_dtu/micro_piv/mean_vels/"
 
     # Choose which plots to show
-    plotXY = False # Plots both x- and y-velocities in subplots
-    plotFLOW = True # Plots y-velocities (normally flow direction)
+    plotXY = False  # Plots both x- and y-velocities in subplots
+    plotFLOW = True  # Plots y-velocities (normally flow direction)
 
     if not os.path.exists(main_dir):
         print "Error: main directory does not exist!"
@@ -143,6 +170,8 @@ if __name__ == '__main__':
 
         velocity_dict = collections.OrderedDict(sorted(velocity_dict.items()))
         # Sorts the dictionary
+
+        plot_raw()
 
         if plotXY:
             plot_xy()
